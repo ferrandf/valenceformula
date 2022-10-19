@@ -2,6 +2,8 @@ import analysis.complex.cauchy_integral
 import analysis.complex.upper_half_plane.topology
 import analysis.complex.upper_half_plane.functions_bounded_at_infty
 import analysis.calculus.fderiv
+import ring_theory.subsemiring.basic
+import algebra.algebra.basic
 
 open_locale classical
 noncomputable theory
@@ -56,7 +58,7 @@ lemma hol_order_well_defined {p : formal_multilinear_series ℂ ℂ ℂ}
   by simp [pseries_unique f hfp]
 
 
-
+/-
 structure meromorphic_function (F : ℂ → ℂ):=
   (f : ℂ → ℂ)
   (hf : is_holomorphic_on_ℍ f)
@@ -66,42 +68,81 @@ structure meromorphic_function (F : ℂ → ℂ):=
 
 -- def order (F : ℂ → ℂ) (h : meromorphic_function F) (z : ℍ) : ℤ :=
 --  let ⟨f, hf, g, hg, quo⟩ := h in (@hol_order f hf z) - (@hol_order g hg z)
+-/
+
+lemma sum_of_bounded_is_bounded {f g : ℍ → ℂ} (hf : is_bounded_at_im_infty f)
+  (hg : is_bounded_at_im_infty g) : is_bounded_at_im_infty (f + g) :=
+  sorry
 
 
-
+lemma const_is_bounded (c : ℂ) : is_bounded_at_im_infty (λ z : ℍ, c) :=
+  begin
+    sorry,
+  end
 
 
 def Holℍ : subsemiring (ℂ → ℂ) := {
   carrier := is_holomorphic_on_ℍ,
   mul_mem' := λ f g hf hg, ⟨differentiable_on.mul hf.diff hg.diff,
-  is_bounded_at_im_infty.mul hf.bdd_at_infty hg.bdd_at_infty⟩,
-  one_mem' :=
+  prod_of_bounded_is_bounded hf.bdd_at_infty hg.bdd_at_infty⟩,
+  one_mem' := ⟨differentiable_on_const 1, const_is_bounded 1⟩,
+  /-begin
+    split,
+    exact differentiable_on_const 1,
+    exact const_is_bounded 1,
+  end,-/
+  add_mem' := λ f g hf hg, ⟨differentiable_on.add hf.diff hg.diff,
+  sum_of_bounded_is_bounded hf.bdd_at_infty hg.bdd_at_infty⟩,
+  zero_mem' := ⟨differentiable_on_const 0, zero_form_is_bounded_at_im_infty⟩,
+  /-
   begin
-  sorry
-  end,
-  add_mem' :=
-  begin
-  sorry
-  end,
-  zero_mem' :=
-  begin
-  sorry
+    split,
+    exact differentiable_on_const 0,
+    exact zero_form_is_bounded_at_im_infty,
   end
+  -/
 }
 
+@[simp] lemma comm_Holℍ (f : Holℍ) (g : Holℍ) : f*g = g*f :=
+sorry 
+
+/-
+instance Holℍ_algebra : algebra ℂ→ℂ Holℍ :=
+  algebra.of_subsemiring Holℍ
+-/
+
 instance : algebra ℂ Holℍ := 
-{ smul := by {
-  
-},
-  to_fun := λ r, ⟨(λ z, r), by {
-    sorry
-  }⟩,
-  map_one' := by
-  {
-    sorry
+{ smul := 
+  by {
+    sorry,
   },
-  map_mul' := sorry,
-  map_zero' := sorry,
-  map_add' := sorry,
-  commutes' := sorry,
-  smul_def' := sorry }
+  to_fun := λ r, ⟨(λ z, r), by {
+    split,
+    exact differentiable_on_const r,
+    exact const_is_bounded r,
+  }⟩,
+  map_one':= 
+  by {
+    refl,
+  },
+  map_mul':= by {
+    intros x y,
+    refl,
+  },
+  map_zero' := by {
+    refl,
+  },
+  map_add' := by {
+    intros x y,
+    refl,
+  },
+  commutes' := by {
+    intros r x,
+    simp,
+  },
+  smul_def' := by {
+    intros r x,
+    simp,
+    sorry,
+  }
+}
