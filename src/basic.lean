@@ -106,10 +106,6 @@ def Holℍ : subsemiring (ℂ → ℂ) := {
 @[simp] lemma comm_Holℍ (f : Holℍ) (g : Holℍ) : f*g = g*f :=
 sorry 
 
-/-
-instance Holℍ_algebra : algebra ℂ→ℂ Holℍ :=
-  algebra.of_subsemiring Holℍ
--/
 
 instance : algebra ℂ Holℍ := 
 { smul := 
