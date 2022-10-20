@@ -70,14 +70,14 @@ structure meromorphic_function (F : ℂ → ℂ):=
 --  let ⟨f, hf, g, hg, quo⟩ := h in (@hol_order f hf z) - (@hol_order g hg z)
 -/
 
-lemma sum_of_bounded_is_bounded {f g : ℍ → ℂ} (hf : is_bounded_at_im_infty f)
-  (hg : is_bounded_at_im_infty g) : is_bounded_at_im_infty (f + g) :=
-  sorry
 
 
 lemma const_is_bounded (c : ℂ) : is_bounded_at_im_infty (λ z : ℍ, c) :=
   begin
-    sorry,
+  simp only [bounded_mem],
+  use c.abs, use 0,
+  intros z hz,
+  linarith,
   end
 
 
@@ -92,7 +92,7 @@ def Holℍ : subsemiring (ℂ → ℂ) := {
     exact const_is_bounded 1,
   end,-/
   add_mem' := λ f g hf hg, ⟨differentiable_on.add hf.diff hg.diff,
-  sum_of_bounded_is_bounded hf.bdd_at_infty hg.bdd_at_infty⟩,
+  hf.bdd_at_infty.add hg.bdd_at_infty⟩,
   zero_mem' := ⟨differentiable_on_const 0, zero_form_is_bounded_at_im_infty⟩,
   /-
   begin
@@ -103,15 +103,16 @@ def Holℍ : subsemiring (ℂ → ℂ) := {
   -/
 }
 
-@[simp] lemma comm_Holℍ (f : Holℍ) (g : Holℍ) : f*g = g*f :=
-sorry 
 
+
+lemma comm_Holℍ (f : Holℍ) (g : Holℍ) : f*g = g*f :=
+begin
+apply subtype.eq,
+simp [mul_comm],
+end
 
 instance : algebra ℂ Holℍ := 
-{ smul := 
-  by {
-    sorry,
-  },
+{ smul := λ r f, ⟨(λ z, r * f.val z), by sorry⟩,
   to_fun := λ r, ⟨(λ z, r), by {
     split,
     exact differentiable_on_const r,
@@ -128,17 +129,13 @@ instance : algebra ℂ Holℍ :=
   map_zero' := by {
     refl,
   },
-  map_add' := by {
-    intros x y,
-    refl,
-  },
-  commutes' := by {
-    intros r x,
-    simp,
-  },
+  map_add' := λ _ _, rfl,
+  commutes' := λ _ _, by {rw comm_Holℍ},
   smul_def' := by {
-    intros r x,
+    intros r f,
+    apply subtype.eq,
     simp,
-    sorry,
+    change _  = λ (z : ℂ), r * f.val z,
+    simp,
   }
 }
