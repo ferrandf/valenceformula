@@ -4,6 +4,7 @@ import analysis.complex.upper_half_plane.functions_bounded_at_infty
 import analysis.calculus.fderiv
 import ring_theory.subsemiring.basic
 import algebra.algebra.basic
+import ring_theory.localization.fraction_ring
 
 open_locale classical
 noncomputable theory
@@ -66,10 +67,9 @@ structure meromorphic_function (F : ℂ → ℂ):=
   (hg : is_holomorphic_on_ℍ g)
   (quo : F = f / g)
 
--- def order (F : ℂ → ℂ) (h : meromorphic_function F) (z : ℍ) : ℤ :=
---  let ⟨f, hf, g, hg, quo⟩ := h in (@hol_order f hf z) - (@hol_order g hg z)
+def order (F : ℂ → ℂ) (h : meromorphic_function F) (z : ℍ) : ℤ :=
+  let ⟨f, hf, g, hg, quo⟩ := h in (@hol_order f hf z) - (@hol_order g hg z)
 -/
-
 
 
 lemma const_is_bounded (c : ℂ) : is_bounded_at_im_infty (λ z : ℍ, c) :=
@@ -86,49 +86,42 @@ def Holℍ : subsemiring (ℂ → ℂ) := {
   mul_mem' := λ f g hf hg, ⟨differentiable_on.mul hf.diff hg.diff,
   prod_of_bounded_is_bounded hf.bdd_at_infty hg.bdd_at_infty⟩,
   one_mem' := ⟨differentiable_on_const 1, const_is_bounded 1⟩,
-  /-begin
-    split,
-    exact differentiable_on_const 1,
-    exact const_is_bounded 1,
-  end,-/
   add_mem' := λ f g hf hg, ⟨differentiable_on.add hf.diff hg.diff,
   hf.bdd_at_infty.add hg.bdd_at_infty⟩,
   zero_mem' := ⟨differentiable_on_const 0, zero_form_is_bounded_at_im_infty⟩,
-  /-
-  begin
-    split,
-    exact differentiable_on_const 0,
-    exact zero_form_is_bounded_at_im_infty,
-  end
-  -/
 }
 
+lemma bounded_at_im_infty.smul {f : ℍ → ℂ} (c: ℂ) (hf : is_bounded_at_im_infty f) : 
+is_bounded_at_im_infty (λ z : ℍ, c * f z) :=
+begin
+let h : ℍ → ℂ := λ z, c,
+let j := const_is_bounded c,
+exact prod_of_bounded_is_bounded j hf,
+end
 
-
-lemma comm_Holℍ (f : Holℍ) (g : Holℍ) : f*g = g*f :=
+lemma comm_Holℍ (f g : Holℍ) : f*g = g*f :=
 begin
 apply subtype.eq,
 simp [mul_comm],
 end
 
+
 instance : algebra ℂ Holℍ := 
-{ smul := λ r f, ⟨(λ z, r * f.val z), by sorry⟩,
+{ smul := λ r f, ⟨(λ z, r * f.val z), by {
+  have hf : is_holomorphic_on_ℍ f,
+  sorry, -- carrier of Holℍ is is_holomorphic_on_ℍ. simp and refl don't work.
+  split,
+  exact differentiable_on.const_smul hf.diff r,
+  exact bounded_at_im_infty.smul r hf.bdd_at_infty,
+  }⟩,
   to_fun := λ r, ⟨(λ z, r), by {
     split,
     exact differentiable_on_const r,
     exact const_is_bounded r,
   }⟩,
-  map_one':= 
-  by {
-    refl,
-  },
-  map_mul':= by {
-    intros x y,
-    refl,
-  },
-  map_zero' := by {
-    refl,
-  },
+  map_one':= rfl,
+  map_mul':= λ _ _, rfl,
+  map_zero' := rfl,
   map_add' := λ _ _, rfl,
   commutes' := λ _ _, by {rw comm_Holℍ},
   smul_def' := by {
@@ -139,3 +132,19 @@ instance : algebra ℂ Holℍ :=
     simp,
   }
 }
+
+instance : comm_ring Holℍ :=
+sorry
+
+
+def Merℍ := fraction_ring Holℍ
+
+def meromorphic_fraction_of_holomorphic (F : Merℍ) (f : Holℍ) (g : non_zero_divisors Holℍ): F = localization.mk f g := 
+sorry
+
+
+def meromorphic.order (F : Merℍ) (z : ℍ) : ℤ := 
+--I need F as a quotient of f and g both holomorphic.
+--fraction_ring = localization (non_divisors_zero Holℍ).
+-- I would compute the hol_order of f and g and take its difference
+
