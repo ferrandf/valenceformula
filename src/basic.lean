@@ -61,19 +61,6 @@ lemma hol_order_well_defined {p : formal_multilinear_series ℂ ℂ ℂ}
   by simp [pseries_unique f hfp]
 
 
-/-
-structure meromorphic_function (F : ℂ → ℂ):=
-  (f : ℂ → ℂ)
-  (hf : is_holomorphic_on_ℍ f)
-  (g : ℂ → ℂ)
-  (hg : is_holomorphic_on_ℍ g)
-  (quo : F = f / g)
-
-def order (F : ℂ → ℂ) (h : meromorphic_function F) (z : ℍ) : ℤ :=
-  let ⟨f, hf, g, hg, quo⟩ := h in (@hol_order f hf z) - (@hol_order g hg z)
--/
-
-
 lemma const_is_bounded (c : ℂ) : is_bounded_at_im_infty (λ z : ℍ, c) :=
   begin
   simp only [bounded_mem],
@@ -94,8 +81,9 @@ noncomputable def Holℍ : subring (ℂ → ℂ) := {
   neg_mem' := λ f hf, ⟨differentiable_on.neg hf.diff,hf.bdd_at_infty.neg_left⟩
 }
 
-instance is_holomorphic_on (f : ℂ → ℂ) (hf: f ∈ Holℍ) : is_holomorphic_on_ℍ f :=
+instance is_holomorphic_on {f : ℂ → ℂ} [hf: f ∈ Holℍ] : is_holomorphic_on_ℍ f :=
 by simpa [subring.mem_carrier] using hf
+
 
 lemma bounded_at_im_infty.smul {f : ℍ → ℂ} (c: ℂ) (hf : is_bounded_at_im_infty f) : 
 is_bounded_at_im_infty (λ z : ℍ, c * f z) :=
@@ -147,15 +135,25 @@ noncomputable def Merℍ := fraction_ring Holℍ
 
 def Merℍ.mk (f : Holℍ) (g : non_zero_divisors Holℍ) : Merℍ := localization.mk f g
 
-def Merℍ.numerator (f : Merℍ) : Holℍ :=
-((monoid_of _).sec f).1
+def Merℍ.numerator (F : Merℍ) : Holℍ :=
+((monoid_of _).sec F).1
 
-def Merℍ.denominator (f : Merℍ) : (non_zero_divisors Holℍ) :=
-((monoid_of _).sec f).2
+instance numerator_is_holomorphic (F : Merℍ) : is_holomorphic_on_ℍ F.numerator.val :=
+begin
+sorry,
+end
+
+def Merℍ.denominator (F : Merℍ) : (non_zero_divisors Holℍ) :=
+((monoid_of _).sec F).2
+
+instance denominator_is_holomorphic (F : Merℍ) : is_holomorphic_on_ℍ F.denominator.val :=
+begin
+sorry,
+end
+
+--Given F = f/g a meromorphic function and z ∈ ℍ, we can compute the order of F at z as
+--the difference of the order of f and the order of g.
+def meromorphic.order (F : Merℍ) (z : ℍ) : ℤ := 
+hol_order F.numerator.val z - hol_order F.denominator.val z
 
 
-def meromorphic.order (F : Merℍ) (z : ℍ) : ℤ := --λ F z, (hol_order (Merℍ.numerator F) z)
---I need F as a quotient of f and g both holomorphic.
---fraction_ring = localization (non_divisors_zero Holℍ).
--- I would compute the hol_order of f and g and take its difference
-sorry
