@@ -5,6 +5,8 @@ import analysis.calculus.fderiv
 import ring_theory.subsemiring.basic
 import algebra.algebra.basic
 import ring_theory.localization.fraction_ring
+import algebra.algebra.tower
+import ring_theory.localization.basic
 
 open_locale classical
 noncomputable theory
@@ -34,28 +36,28 @@ begin
   (mem_image (λ (x : ℍ), has_coe.coe x) univ ↑z).mpr ⟨z, by finish⟩⟩,
 end
 
-def holoℍ := {f : ℂ → ℂ // is_holomorphic_on_ℍ f}
+--noncomputable def holoℍ := {f : ℂ → ℂ // is_holomorphic_on_ℍ f}
 
-instance (f : holoℍ) : is_holomorphic_on_ℍ f.val := f.prop
+--instance (f : holoℍ) : is_holomorphic_on_ℍ f.val := f.prop
 
-variables (f : holoℍ) (z : ℍ)
+variables (f : ℂ → ℂ) [is_holomorphic_on_ℍ f] (z : ℍ)
 
-def pseries_of_holomorphic := classical.some (analytic_of_holomorphic f.val z)
+noncomputable def pseries_of_holomorphic := classical.some (analytic_of_holomorphic f z)
 
-lemma pseries_of_holomorphic_def : has_fpower_series_at f.val (pseries_of_holomorphic f z) z :=
-  (classical.some_spec (analytic_of_holomorphic f.val z))
+lemma pseries_of_holomorphic_def : has_fpower_series_at f (pseries_of_holomorphic f z) z :=
+  (classical.some_spec (analytic_of_holomorphic f z))
 
 lemma pseries_unique {z : ℍ} {p : formal_multilinear_series ℂ ℂ ℂ}
-(hfp : has_fpower_series_at f.val p z) : p = pseries_of_holomorphic f z :=
+(hfp : has_fpower_series_at f p z) : p = pseries_of_holomorphic f z :=
 begin
   apply has_fpower_series_at.eq_formal_multilinear_series hfp,
   apply pseries_of_holomorphic_def,
 end
 
-@[simp] def hol_order := (pseries_of_holomorphic f z).order
+@[simp] def hol_order : ℤ := (pseries_of_holomorphic f z).order
 
 lemma hol_order_well_defined {p : formal_multilinear_series ℂ ℂ ℂ}
-(hfp : has_fpower_series_at f.val p z) :  p.order = hol_order f z :=
+(hfp : has_fpower_series_at f p z) :  (p.order : ℤ) = hol_order f z :=
   by simp [pseries_unique f hfp]
 
 
@@ -81,7 +83,7 @@ lemma const_is_bounded (c : ℂ) : is_bounded_at_im_infty (λ z : ℍ, c) :=
   end
 
 
-def Holℍ : subsemiring (ℂ → ℂ) := {
+noncomputable def Holℍ : subring (ℂ → ℂ) := {
   carrier := is_holomorphic_on_ℍ,
   mul_mem' := λ f g hf hg, ⟨differentiable_on.mul hf.diff hg.diff,
   prod_of_bounded_is_bounded hf.bdd_at_infty hg.bdd_at_infty⟩,
@@ -89,7 +91,11 @@ def Holℍ : subsemiring (ℂ → ℂ) := {
   add_mem' := λ f g hf hg, ⟨differentiable_on.add hf.diff hg.diff,
   hf.bdd_at_infty.add hg.bdd_at_infty⟩,
   zero_mem' := ⟨differentiable_on_const 0, zero_form_is_bounded_at_im_infty⟩,
+  neg_mem' := λ f hf, ⟨differentiable_on.neg hf.diff,hf.bdd_at_infty.neg_left⟩
 }
+
+instance is_holomorphic_on (f : ℂ → ℂ) (hf: f ∈ Holℍ) : is_holomorphic_on_ℍ f :=
+by simpa [subring.mem_carrier] using hf
 
 lemma bounded_at_im_infty.smul {f : ℍ → ℂ} (c: ℂ) (hf : is_bounded_at_im_infty f) : 
 is_bounded_at_im_infty (λ z : ℍ, c * f z) :=
@@ -99,6 +105,14 @@ let j := const_is_bounded c,
 exact prod_of_bounded_is_bounded j hf,
 end
 
+instance : has_smul ℂ Holℍ := 
+⟨λ r f, ⟨λ z, r * f.val z, ⟨differentiable_on.const_smul f.prop.diff r,
+bounded_at_im_infty.smul r f.prop.bdd_at_infty⟩⟩⟩
+
+@[simp] lemma smul_def {f : ℂ → ℂ} (hf : f ∈ Holℍ) {c : ℂ} : (c • f) = λ z, (c * (f z)) := rfl
+@[simp] lemma smul_def' {f : Holℍ} {c : ℂ} : (c • f).val = λ z, (c * (f.val z)) := rfl
+
+
 lemma comm_Holℍ (f g : Holℍ) : f*g = g*f :=
 begin
 apply subtype.eq,
@@ -107,13 +121,7 @@ end
 
 
 instance : algebra ℂ Holℍ := 
-{ smul := λ r f, ⟨(λ z, r * f.val z), by {
-  have hf : is_holomorphic_on_ℍ f,
-  sorry, -- carrier of Holℍ is is_holomorphic_on_ℍ. simp and refl don't work.
-  split,
-  exact differentiable_on.const_smul hf.diff r,
-  exact bounded_at_im_infty.smul r hf.bdd_at_infty,
-  }⟩,
+{ smul := has_smul.smul,
   to_fun := λ r, ⟨(λ z, r), by {
     split,
     exact differentiable_on_const r,
@@ -133,18 +141,21 @@ instance : algebra ℂ Holℍ :=
   }
 }
 
-instance : comm_ring Holℍ :=
-sorry
+open localization
+
+noncomputable def Merℍ := fraction_ring Holℍ
+
+def Merℍ.mk (f : Holℍ) (g : non_zero_divisors Holℍ) : Merℍ := localization.mk f g
+
+def Merℍ.numerator (f : Merℍ) : Holℍ :=
+((monoid_of _).sec f).1
+
+def Merℍ.denominator (f : Merℍ) : (non_zero_divisors Holℍ) :=
+((monoid_of _).sec f).2
 
 
-def Merℍ := fraction_ring Holℍ
-
-def meromorphic_fraction_of_holomorphic (F : Merℍ) (f : Holℍ) (g : non_zero_divisors Holℍ): F = localization.mk f g := 
-sorry
-
-
-def meromorphic.order (F : Merℍ) (z : ℍ) : ℤ := 
+def meromorphic.order (F : Merℍ) (z : ℍ) : ℤ := --λ F z, (hol_order (Merℍ.numerator F) z)
 --I need F as a quotient of f and g both holomorphic.
 --fraction_ring = localization (non_divisors_zero Holℍ).
 -- I would compute the hol_order of f and g and take its difference
-
+sorry
