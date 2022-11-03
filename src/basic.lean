@@ -7,6 +7,9 @@ import algebra.algebra.basic
 import ring_theory.localization.fraction_ring
 import algebra.algebra.tower
 import ring_theory.localization.basic
+import number_theory.modular_forms.slash_actions
+
+
 
 open_locale classical
 noncomputable theory
@@ -39,7 +42,7 @@ end
 --noncomputable def holoℍ := {f : ℂ → ℂ // is_holomorphic_on_ℍ f}
 
 --instance (f : holoℍ) : is_holomorphic_on_ℍ f.val := f.prop
-
+section
 variables (f : ℂ → ℂ) [is_holomorphic_on_ℍ f] (z : ℍ)
 
 noncomputable def pseries_of_holomorphic := classical.some (analytic_of_holomorphic f z)
@@ -122,6 +125,7 @@ instance : algebra ℂ Holℍ :=
   commutes' := λ _ _, by {rw comm_Holℍ},
   smul_def' := by {
     intros r f,
+    simp,
     apply subtype.eq,
     simp,
     change _  = λ (z : ℂ), r * f.val z,
@@ -132,6 +136,11 @@ instance : algebra ℂ Holℍ :=
 open localization
 
 noncomputable def Merℍ := fraction_ring Holℍ
+
+instance Merℍ_is_field : field Merℍ := 
+begin
+sorry,
+end
 
 def Merℍ.mk (f : Holℍ) (g : non_zero_divisors Holℍ) : Merℍ := localization.mk f g
 
@@ -156,4 +165,79 @@ end
 def meromorphic.order (F : Merℍ) (z : ℍ) : ℤ := 
 hol_order F.numerator.val z - hol_order F.denominator.val z
 
+--next step would be to give the definition of a weakly modular form on the upper half plane.
+--from here i could start by trying to state the valence formula.
+end
+section
+namespace modular_forms
 
+open_locale upper_half_plane
+
+local prefix `↑ₘ`:1024 := @coe _ (matrix (fin 2) (fin 2) _) _
+
+local notation `GL(` n `, ` R `)`⁺ := matrix.GL_pos (fin n) R
+
+local notation `SL(` n `, ` R `)` := matrix.special_linear_group (fin n) R
+
+variables {Γ : subgroup SL(2,ℤ)} {k: ℤ} (f : ℂ → ℂ) [is_holomorphic_on_ℍ f] (z : ℍ)
+
+-- The file slash_actions has defined the slash operator f∣[k] γ 
+
+localized "notation (name := modular_forms.slash) f ` ∣[`:100 k `]`:0 γ :100 :=
+  modular_forms.slash k γ f" in modular_forms
+
+-- taken from branch modular_forms by Chris Birkbeck
+def weakly_modular_submodule (k : ℤ)  (Γ : subgroup SL(2,ℤ)): submodule ℂ (ℍ  → ℂ) := {
+  carrier := {f : (ℍ → ℂ) | ∀ (γ : Γ),  (f ∣[k] (γ : GL(2, ℝ)⁺)) = f },
+  zero_mem' := by {simp only [set.mem_set_of_eq, coe_coe],
+  simp_rw slash,
+  simp only [forall_const, zero_mul, pi.zero_apply],
+  refl, },
+  add_mem' := by {intros f g hf hg,
+  simp only [set.mem_set_of_eq, coe_coe] at *,
+  intro γ,
+  have hff:= hf γ,
+  have hgg:= hg γ,
+  rw [←coe_coe, ←coe_coe] at *,
+  rw slash_add k γ f g,
+  rw [hff, hgg], },
+  smul_mem' := by {intros c f hf,
+  simp only [set.mem_set_of_eq, coe_coe] at *,
+  intro γ,
+  have hff:= hf γ,
+  have : (c • f)  ∣[k] γ = c • (f  ∣[k] γ ),
+  by {apply smul_slash},
+  rw ←  coe_coe at *,
+  rw ←  coe_coe at *,
+  rw hff at this,
+  apply this,}}
+  
+
+
+
+  class is_modular_form_weight_k (k : ℤ) (Γ : subgroup SL(2,ℤ)) (f : ℂ → ℂ) : Prop :=
+  (hol : is_holomorphic_on_ℍ f)
+  (subm : ↑f ∈ weakly_modular_submodule k Γ)
+
+def space_of_modular_forms_weight_k (k : ℤ) (Γ : subgroup SL(2,ℤ)) : submodule ℂ (ℍ → ℂ) := { 
+  carrier := {f : ℍ → ℂ | is_modular_form_weight_k k Γ f},
+  add_mem' := _,
+  zero_mem' := _,
+  smul_mem' := _,
+  }
+
+  class is_meromorphic_modular_form_weight_k (k : ℤ) (f : ℂ → ℂ) : Prop :=
+  (mer : f ∈ Merℍ)
+  (subm : ↑f ∈ weakly_modular_submodule k Γ)
+
+
+
+
+--def is_meromorphic_modular_form_weight_k := {f : Merℍ | ∀ (γ : Γ), (f ∣[k] (γ : Γ)) = f}
+
+
+
+
+
+end modular_forms
+end
