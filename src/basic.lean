@@ -4,6 +4,7 @@ import analysis.complex.upper_half_plane.functions_bounded_at_infty
 import analysis.calculus.fderiv
 import ring_theory.subsemiring.basic
 import algebra.algebra.basic
+import ring_theory.subring.basic
 import ring_theory.localization.fraction_ring
 import algebra.algebra.tower
 import ring_theory.localization.basic
@@ -84,8 +85,20 @@ noncomputable def Holℍ : subring (ℂ → ℂ) := {
   neg_mem' := λ f hf, ⟨differentiable_on.neg hf.diff,hf.bdd_at_infty.neg_left⟩
 }
 
-instance is_holomorphic_on {f : ℂ → ℂ} [hf: f ∈ Holℍ] : is_holomorphic_on_ℍ f :=
-by simpa [subring.mem_carrier] using hf
+def Holℍ.order (f : Holℍ) (z : ℍ) : ℤ := @hol_order f.val f.property z
+
+instance : is_domain (ℂ → ℂ) := {
+  eq_zero_or_eq_zero_of_mul_eq_zero := 
+  begin
+  intros f g h,
+  sorry
+  end,
+  exists_pair_ne := ⟨λ z, 0, λ z, 1, by
+  simp only [ne.def, function.const_inj, zero_ne_one, not_false_iff]⟩}
+
+
+--instance is_holomorphic_on  : is_holomorphic_on_ℍ f :=
+--by simpa [subring.mem_carrier] using hf
 
 
 lemma bounded_at_im_infty.smul {f : ℍ → ℂ} (c: ℂ) (hf : is_bounded_at_im_infty f) : 
@@ -139,7 +152,7 @@ noncomputable def Merℍ := fraction_ring Holℍ
 
 instance Merℍ_is_field : field Merℍ := 
 begin
-sorry,
+apply fraction_ring.field,
 end
 
 def Merℍ.mk (f : Holℍ) (g : non_zero_divisors Holℍ) : Merℍ := localization.mk f g
@@ -147,23 +160,15 @@ def Merℍ.mk (f : Holℍ) (g : non_zero_divisors Holℍ) : Merℍ := localizati
 def Merℍ.numerator (F : Merℍ) : Holℍ :=
 ((monoid_of _).sec F).1
 
-instance numerator_is_holomorphic (F : Merℍ) : is_holomorphic_on_ℍ F.numerator.val :=
-begin
-sorry,
-end
+-- instance numerator_is_holomorphic (F : Merℍ) : is_holomorphic_on_ℍ F.numerator.val := F.numerator.property
 
 def Merℍ.denominator (F : Merℍ) : (non_zero_divisors Holℍ) :=
 ((monoid_of _).sec F).2
 
-instance denominator_is_holomorphic (F : Merℍ) : is_holomorphic_on_ℍ F.denominator.val :=
-begin
-sorry,
-end
-
 --Given F = f/g a meromorphic function and z ∈ ℍ, we can compute the order of F at z as
 --the difference of the order of f and the order of g.
 def meromorphic.order (F : Merℍ) (z : ℍ) : ℤ := 
-hol_order F.numerator.val z - hol_order F.denominator.val z
+Holℍ.order F.numerator z - Holℍ.order F.denominator z
 
 --next step would be to give the definition of a weakly modular form on the upper half plane.
 --from here i could start by trying to state the valence formula.
@@ -187,8 +192,8 @@ localized "notation (name := modular_forms.slash) f ` ∣[`:100 k `]`:0 γ :100 
   modular_forms.slash k γ f" in modular_forms
 
 -- taken from branch modular_forms by Chris Birkbeck
-def weakly_modular_submodule (k : ℤ)  (Γ : subgroup SL(2,ℤ)): submodule ℂ (ℍ  → ℂ) := {
-  carrier := {f : (ℍ → ℂ) | ∀ (γ : Γ),  (f ∣[k] (γ : GL(2, ℝ)⁺)) = f },
+def weakly_modular_submodule (k : ℤ)  (Γ : subgroup SL(2,ℤ)): submodule ℂ (ℂ  → ℂ) := {
+  carrier := {f : (ℂ → ℂ) | ∀ (γ : Γ),  (f ∣[k] (γ : GL(2, ℝ)⁺)) = f },
   zero_mem' := by {simp only [set.mem_set_of_eq, coe_coe],
   simp_rw slash,
   simp only [forall_const, zero_mul, pi.zero_apply],
@@ -219,16 +224,18 @@ def weakly_modular_submodule (k : ℤ)  (Γ : subgroup SL(2,ℤ)): submodule ℂ
   (hol : is_holomorphic_on_ℍ f)
   (subm : ↑f ∈ weakly_modular_submodule k Γ)
 
-def space_of_modular_forms_weight_k (k : ℤ) (Γ : subgroup SL(2,ℤ)) : submodule ℂ (ℍ → ℂ) := { 
-  carrier := {f : ℍ → ℂ | is_modular_form_weight_k k Γ f},
+
+def space_of_modular_forms_weight_k (k : ℤ) (Γ : subgroup SL(2,ℤ)) : submodule ℂ (ℂ → ℂ) := { 
+  carrier := {f : ℂ → ℂ | is_modular_form_weight_k k Γ f},
   add_mem' := _,
   zero_mem' := _,
   smul_mem' := _,
   }
 
-  class is_meromorphic_modular_form_weight_k (k : ℤ) (f : ℂ → ℂ) : Prop :=
-  (mer : f ∈ Merℍ)
-  (subm : ↑f ∈ weakly_modular_submodule k Γ)
+instance : has_mem Merℍ (submodule ℂ (ℂ → ℂ)) := ⟨λ f V, (λ z, (f.numerator.val z / f.denominator.val.val z)) ∈ V⟩
+
+  class is_meromorphic_modular_form_weight_k (k : ℤ) (f : Merℍ) : Prop :=
+  (subm : f ∈ weakly_modular_submodule k Γ)
 
 
 
