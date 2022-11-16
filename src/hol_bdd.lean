@@ -28,7 +28,7 @@ instance tst : has_coe (set ℍ') (set ℂ) := ⟨λ U, has_coe.coe '' U⟩
 instance : has_coe (ℂ → ℂ) (ℍ → ℂ) := ⟨λ f, (λ z, f z)⟩
 
 class is_holomorphic_bdd (f : ℍ' → ℂ) : Prop :=
-  (diff : is_holomorphic_on f)--differentiable_on ℂ (extend_by_zero f) (univ : set ℍ'))
+  (diff : is_holomorphic_on f)
   (bdd_at_infty : is_bounded_at_im_infty f)
 
 lemma open_univ : is_open ((univ : set ℍ') : set ℂ) :=
