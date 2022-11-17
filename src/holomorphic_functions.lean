@@ -114,11 +114,11 @@ end
 lemma ext_by_zero_eq' (D: open_subs) (f : D.1 → ℂ) (y : ℂ) (h: y ∈ (D.1 : set ℂ)):
   extend_by_zero (f ) y = (f ⟨ y, h⟩) :=
 begin
- rw extend_by_zero,
- simp,
- cases D,
- dsimp at *,
- exact dif_pos h,
+  rw extend_by_zero,
+  simp,
+  cases D,
+  dsimp at *,
+  exact dif_pos h,
 end
 
 lemma ext_by_zero_apply (D: open_subs) (f : D.1 → ℂ) (y : D.1) :
@@ -184,8 +184,8 @@ begin
   cases g_hol z₀ with g'z₀ Hg,
   existsi f'z₀*(extend_by_zero g z₀) + (extend_by_zero f z₀)*g'z₀,
   rw extend_by_zero_mul,
- have:=has_deriv_within_at.mul Hf Hg,
- exact this,
+  have:=has_deriv_within_at.mul Hf Hg,
+  exact this,
 end
 
 lemma neg_hol (f : D.1 → ℂ) (f_hol : is_holomorphic_on f) : is_holomorphic_on (-f) :=
@@ -202,10 +202,10 @@ end
 def hol_ring (D: open_subs) : subring (D.1 → ℂ) :=
 { carrier := {f : D.1 → ℂ | is_holomorphic_on f},
   zero_mem' := zero_hol D,
- add_mem'  := add_hol,
- neg_mem'  := neg_hol,
- mul_mem'  := mul_hol,
- one_mem'  := one_hol D
+  add_mem'  := add_hol,
+  neg_mem'  := neg_hol,
+  mul_mem'  := mul_hol,
+  one_mem'  := one_hol D
 }
 
 lemma smul_hol (c : ℂ) (f : D.1 → ℂ) (f_hol : is_holomorphic_on f) : is_holomorphic_on (c • f) :=

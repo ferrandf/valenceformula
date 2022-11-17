@@ -21,9 +21,9 @@ local notation `ℍ'`:=(⟨upper_half_space , upper_half_plane_is_open⟩: open_
 
 local notation `ℍ`:=upper_half_plane
 
-instance : has_coe (set ℍ) (set ℂ) := ⟨λ U, has_coe.coe '' U⟩
+--instance : has_coe (set ℍ) (set ℂ) := ⟨λ U, has_coe.coe '' U⟩
 
-instance tst : has_coe (set ℍ') (set ℂ) := ⟨λ U, has_coe.coe '' U⟩ 
+instance : has_coe (set ℍ') (set ℂ) := ⟨λ U, subtype.val '' U⟩
 
 instance : has_coe (ℂ → ℂ) (ℍ → ℂ) := ⟨λ f, (λ z, f z)⟩
 
@@ -34,23 +34,32 @@ class is_holomorphic_bdd (f : ℍ' → ℂ) : Prop :=
 lemma open_univ : is_open ((univ : set ℍ') : set ℂ) :=
   open_embedding.is_open_map open_embedding_coe _ is_open_univ
 
+lemma mykey' : (has_coe.coe : ℍ' → ℂ) = (λ z, z.val) :=
+begin
+  finish,
+end
+
+lemma mykey : upper_half_space = has_coe.coe '' (univ : set ℍ') :=
+begin
+  rw mykey',
+  finish,
+end
 
 lemma analytic_of_holomorphic (f : ℍ' → ℂ) [h : is_holomorphic_bdd f] (z : ℍ') :
 analytic_at ℂ (extend_by_zero f) z :=
 begin
   have hff := h.diff,
-  have hf : differentiable_on ℂ (extend_by_zero f) (univ : set ℍ'), 
-  have j := (is_holomorphic_on_iff_differentiable_on ℍ' f),
-  sorry,
-  --exact iff.elim_right j hff,
+  have hf : differentiable_on ℂ (extend_by_zero f) (has_coe.coe '' (univ : set ℍ')),
+  { 
+    have j := (is_holomorphic_on_iff_differentiable_on ℍ' f),
+    dsimp at j,
+    rw ← mykey,
+    exact iff.elim_right j hff,
+  },
   apply differentiable_on.analytic_at hf,
   refine mem_nhds_iff.mpr _,
   use (univ : set ℍ'),
-  split,
-  exact rfl.subset,
-  split,
-  exact open_univ,
-  exact (mem_image (λ (x : ℍ'), has_coe.coe x) (univ : set ℍ') ↑z).mpr ⟨z, by finish⟩,
+  exact ⟨rfl.subset, open_univ, ⟨z, by finish⟩⟩,
 end
 
 variables (f : ℍ' → ℂ) [is_holomorphic_bdd f] (z : ℍ')
@@ -93,8 +102,7 @@ noncomputable def Holℍ : subring (ℍ' → ℂ) := {
   neg_mem' := λ f hf, ⟨neg_hol f hf.diff,hf.bdd_at_infty.neg_left⟩
 }
 
---instance is_holomorphic_on  : is_holomorphic_bdd f :=
---by simpa [subring.mem_carrier] using hf
+instance is_holomorphic_on' (f : Holℍ) : is_holomorphic_bdd f := sorry
 
 def Holℍ.order (f : Holℍ) (z : ℍ) : ℤ := @hol_order f.val f.property z
 
@@ -112,7 +120,15 @@ instance : is_domain Holℍ :=
   --we can apply has_fpower_series_on_ball.eventually_eq_zero which says that if a 
   -- function f has fpower series equal to zero in a ball then the function is f == 0.
   --have p : formal_multilinear_series ℂ ℂ ℂ, sorry,
-  sorry,
+  by_contradiction,
+  push_neg at h,
+  cases h with hf_ne_zero hg_ne_zero,
+  have hc : f * g ≠ 0,
+  {
+    set F := pseries_of_holomorphic f (⟨(⟨0, 1⟩ : ℂ), by sorry⟩ : ℍ') with hF,
+    sorry
+  },
+  exact hc h,
   end,
   exists_pair_ne := 
   begin
