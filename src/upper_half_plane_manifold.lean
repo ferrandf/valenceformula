@@ -26,7 +26,6 @@ local notation `ℍ'`:=(⟨upper_half_space , upper_half_plane_is_open⟩: open_
 
 local notation `ℍ`:=upper_half_plane
 
-
 variable (f : ℍ' → ℂ)
 
 instance : inhabited ℍ' :=
