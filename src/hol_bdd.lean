@@ -59,7 +59,7 @@ begin
   apply differentiable_on.analytic_at hf,
   refine mem_nhds_iff.mpr _,
   use (univ : set ℍ'),
-  exact ⟨rfl.subset, open_univ, ⟨z, by finish⟩⟩,
+  exact ⟨rfl.subset, open_univ, sorry⟩,--⟨z, by finish⟩⟩,
 end
 
 variables (f : ℍ' → ℂ) [is_holomorphic_bdd f] (z : ℍ')
@@ -106,12 +106,47 @@ instance is_holomorphic_on' (f : Holℍ) : is_holomorphic_bdd f := sorry
 
 def Holℍ.order (f : Holℍ) (z : ℍ) : ℤ := @hol_order f.val f.property z
 
-constant x : ℍ'
+/-- A one-dimensional formal multilinear series representing the zero function is zero. 
+lemma has_fpower_series_at.eq_zero {p : formal_multilinear_series 𝕜 𝕜 E} {x : 𝕜}
+  (h : has_fpower_series_at 0 p x) : p = 0 :=
+by { ext n x, rw ←mk_pi_field_apply_one_eq_self (p n), simp [h.apply_eq_zero n 1] }-/
+
+lemma pseries_neq_zero_function_neq_zero (z : ℍ') (f : Holℍ) 
+(p : has_fpower_series_at (extend_by_zero f.val) (pseries_of_holomorphic f z) z) 
+(hp : (pseries_of_holomorphic f z) ≠ 0): 
+f.val ≠ (0 : ℍ' → ℂ) :=
+begin
+  by_contradiction,
+  have hc : (pseries_of_holomorphic f z) = 0,
+  {
+    have j : extend_by_zero f.val = 0,
+    {
+      rw h,
+      exact extend_by_zero_zero',
+    },
+    rw j at p,
+    rw has_fpower_series_at.eq_zero p,
+  },
+  exact hp hc,
+end
+
+lemma function_new_zero_forall_z_pseries_new_zero (f : Holℍ)
+(hf : f.val ≠ (0 : ℍ' → ℂ)) : ∀ z : ℍ', (pseries_of_holomorphic f z) ≠ 0 :=
+begin
+intro z,
+by_contradiction,
+have hc : f.val = 0,
+{
+  simp,
+  sorry,
+},
+sorry,
+end
 
 instance : is_domain Holℍ := 
 { eq_zero_or_eq_zero_of_mul_eq_zero := 
   begin
-  intros f g h,
+  intros f g q,
   have hf := f.prop,
   have hff : is_holomorphic_bdd f.val := by assumption,
   --idea: f is holomorphic_bdd then it has_fpower_series_on_ball x r,
@@ -125,10 +160,12 @@ instance : is_domain Holℍ :=
   cases h with hf_ne_zero hg_ne_zero,
   have hc : f * g ≠ 0,
   {
-    set F := pseries_of_holomorphic f (⟨(⟨0, 1⟩ : ℂ), by sorry⟩ : ℍ') with hF,
-    sorry
+    have i := (⟨0, 1⟩ : ℂ),
+    set F := pseries_of_holomorphic f (⟨i, by sorry⟩ : ℍ') with hF,
+    --have hh : has_fpower_series_at (extend_by_zero f.val) hF i.val,
+    sorry,
   },
-  exact hc h,
+  exact hc q,
   end,
   exists_pair_ne := 
   begin
