@@ -8,6 +8,7 @@ import ring_theory.localization.fraction_ring
 import .upper_half_plane_manifold
 import .holomorphic_functions
 import analysis.complex.basic
+import analysis.analytic.isolated_zeros
 
 
 
@@ -48,13 +49,12 @@ end
 lemma analytic_of_holomorphic (f : ℍ' → ℂ) [h : is_holomorphic_bdd f] (z : ℍ') :
 analytic_at ℂ (extend_by_zero f) z :=
 begin
-  have hff := h.diff,
   have hf : differentiable_on ℂ (extend_by_zero f) (has_coe.coe '' (univ : set ℍ')),
   { 
     have j := (is_holomorphic_on_iff_differentiable_on ℍ' f),
     dsimp at j,
     rw ← mykey,
-    exact iff.elim_right j hff,
+    exact iff.elim_right j h.diff,
   },
   apply differentiable_on.analytic_at hf,
   refine mem_nhds_iff.mpr _,
@@ -102,7 +102,10 @@ noncomputable def Holℍ : subring (ℍ' → ℂ) := {
   neg_mem' := λ f hf, ⟨neg_hol f hf.diff,hf.bdd_at_infty.neg_left⟩
 }
 
-instance is_holomorphic_on' (f : Holℍ) : is_holomorphic_bdd f := sorry
+instance is_holomorphic_on' (f : Holℍ) : is_holomorphic_bdd f := 
+begin
+sorry,
+end
 
 def Holℍ.order (f : Holℍ) (z : ℍ) : ℤ := @hol_order f.val f.property z
 
@@ -111,8 +114,7 @@ lemma has_fpower_series_at.eq_zero {p : formal_multilinear_series 𝕜 𝕜 E} {
   (h : has_fpower_series_at 0 p x) : p = 0 :=
 by { ext n x, rw ←mk_pi_field_apply_one_eq_self (p n), simp [h.apply_eq_zero n 1] }-/
 
-lemma pseries_neq_zero_function_neq_zero (z : ℍ') (f : Holℍ) 
-(p : has_fpower_series_at (extend_by_zero f.val) (pseries_of_holomorphic f z) z) 
+lemma pseries_neq_zero_function_neq_zero (z : ℍ') (f : Holℍ)  
 (hp : (pseries_of_holomorphic f z) ≠ 0): 
 f.val ≠ (0 : ℍ' → ℂ) :=
 begin
@@ -124,23 +126,54 @@ begin
       rw h,
       exact extend_by_zero_zero',
     },
+    have p : has_fpower_series_at (extend_by_zero f.val) (pseries_of_holomorphic f z) z,
+    {
+      apply pseries_of_holomorphic_def,
+    },
     rw j at p,
     rw has_fpower_series_at.eq_zero p,
   },
   exact hp hc,
 end
 
-lemma function_new_zero_forall_z_pseries_new_zero (f : Holℍ)
-(hf : f.val ≠ (0 : ℍ' → ℂ)) : ∀ z : ℍ', (pseries_of_holomorphic f z) ≠ 0 :=
+/-lemma has_fpower_series_at.eventually_eq_zero
+  (hf : has_fpower_series_at f (0 : formal_multilinear_series 𝕜 E F) x) :
+  ∀ᶠ z in 𝓝 x, f z = 0 :=
+let ⟨r, hr⟩ := hf in hr.eventually_eq_zero-/
+
+lemma has_fpower_series_at.eventually_eq_zero_everywhere (f : Holℍ) 
+  {p : formal_multilinear_series ℂ ℂ ℂ} (x : ℍ')
+  (hf : has_fpower_series_at (extend_by_zero f.val) (p) (x : ℂ)) 
+  (hF : ∀ᶠ z in 𝓝 x, (extend_by_zero f.val) z = 0):
+  (extend_by_zero f.val) = (0 : ℂ → ℂ) :=
+begin
+
+sorry,
+end
+
+lemma function_neq_zero_forall_z_pseries_neq_zero (f : Holℍ)
+(hf : f ≠ (0)) : ∀ z : ℍ', (pseries_of_holomorphic f z) ≠ 0 :=
 begin
 intro z,
-by_contradiction,
-have hc : f.val = 0,
+have it : f.val ≠ (0 : ℍ' → ℂ),
 {
-  simp,
-  sorry,
+  simp only [subtype.val_eq_coe, ne.def, subring.coe_eq_zero_iff],
+  exact hf,
 },
-sorry,
+by_contradiction,
+have hc : (extend_by_zero f.val) = 0,
+{
+  set F := pseries_of_holomorphic f z with hF,
+  have G : has_fpower_series_at (extend_by_zero f.val) F z,
+  {
+    apply pseries_of_holomorphic_def,
+  },
+  rw h at G,
+  have l := has_fpower_series_at.eventually_eq_zero G,
+  exact has_fpower_series_at.eventually_eq_zero_everywhere f z G l,
+},
+have hcc : f.val = 0 := by exact extend_by_zero_f_eq_zero f.val hc,
+exact it hcc,
 end
 
 instance : is_domain Holℍ := 
@@ -149,12 +182,8 @@ instance : is_domain Holℍ :=
   intros f g q,
   have hf := f.prop,
   have hff : is_holomorphic_bdd f.val := by assumption,
-  --idea: f is holomorphic_bdd then it has_fpower_series_on_ball x r,
-  --let's assume g≠0 for a neighbourhood of x, then f has to be zero in this neighbourhood.
-  --if this happens, we have that the fpower series on ball near x is equal zero.
-  --we can apply has_fpower_series_on_ball.eventually_eq_zero which says that if a 
-  -- function f has fpower series equal to zero in a ball then the function is f == 0.
-  --have p : formal_multilinear_series ℂ ℂ ℂ, sorry,
+  have hg := g.prop,
+  have hgg : is_holomorphic_bdd g.val := by assumption,
   by_contradiction,
   push_neg at h,
   cases h with hf_ne_zero hg_ne_zero,
@@ -162,8 +191,48 @@ instance : is_domain Holℍ :=
   {
     have i := (⟨0, 1⟩ : ℂ),
     set F := pseries_of_holomorphic f (⟨i, by sorry⟩ : ℍ') with hF,
-    --have hh : has_fpower_series_at (extend_by_zero f.val) hF i.val,
+    have Fp : has_fpower_series_at (extend_by_zero f.val) F i,
+    {
+      apply pseries_of_holomorphic_def,
+    },
+    have rf := function_neq_zero_forall_z_pseries_neq_zero f hf_ne_zero,
+    have tf : F ≠ 0,
+    {
+      have := rf (⟨i, by sorry⟩ : ℍ'),
+      assumption,
+    },
+    set G := pseries_of_holomorphic g (⟨i, by sorry⟩ : ℍ') with hG,
+    have Gp : has_fpower_series_at (extend_by_zero g.val) G i,
+    {
+      apply pseries_of_holomorphic_def,
+    },
+    have rg := function_neq_zero_forall_z_pseries_neq_zero g hg_ne_zero,
+    have tg : G ≠ 0,
+    {
+      have := rg (⟨i, by sorry⟩ : ℍ'),
+      assumption,
+    },
+    have ef := has_fpower_series_at.locally_ne_zero Fp tf,
+    have eg := has_fpower_series_at.locally_ne_zero Gp tg,
+
+    have aux1 : (extend_by_zero f.val) * (extend_by_zero g.val) ≠ 0,
+    {
+
+      sorry,
+    },
+    have aux2 : extend_by_zero (f.val * g.val) ≠ 0,
+    {
+      rw ← extend_by_zero_mul at aux1,
+      exact aux1,
+    },
+    have aux3 : f.val * g.val ≠ 0,
+    {
+      exact extend_by_zero_f_neq_zero (f.val * g.val) aux2,
+    },
+    simp only [subtype.val_eq_coe] at aux3,
     sorry,
+    --simp only [coe_subtype] at aux3,
+    --exact aux3,
   },
   exact hc q,
   end,

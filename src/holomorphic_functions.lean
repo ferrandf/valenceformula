@@ -29,6 +29,20 @@ lemma extend_by_zero_zero' [has_zero β] :
 extend_by_zero (0 : s → β) = 0 :=
 by ext z; by_cases h : z ∈ s; simp [extend_by_zero, h]
 
+lemma extend_by_zero_f_eq_zero [has_zero β] (f : s → β)
+(h : extend_by_zero f = 0) : f = 0 :=
+begin
+
+sorry,
+end
+
+lemma extend_by_zero_f_neq_zero [has_zero β] (f : s → β)
+(h : extend_by_zero f ≠ 0) : f ≠ 0 :=
+begin
+
+sorry,
+end
+
 lemma extend_by_zero_add [add_group β] (f g : s → β) :
 extend_by_zero (f + g) = extend_by_zero f + extend_by_zero g :=
 by ext z; by_cases h : z ∈ s; simp [extend_by_zero, h]
@@ -55,6 +69,8 @@ lemma extend_by_zero_smul [ring β] (c : β) (f : s → β) :
   by ext z; by_cases h : z ∈ s; simp [extend_by_zero, h]
 
 end
+
+
 
 
 
