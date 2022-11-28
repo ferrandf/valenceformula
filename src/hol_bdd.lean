@@ -103,9 +103,7 @@ noncomputable def Holℍ : subring (ℍ' → ℂ) := {
 }
 
 instance is_holomorphic_on' (f : Holℍ) : is_holomorphic_bdd f := 
-begin
-sorry,
-end
+subring.mem_carrier.mpr f.property
 
 def Holℍ.order (f : Holℍ) (z : ℍ) : ℤ := @hol_order f.val f.property z
 
@@ -118,7 +116,7 @@ lemma pseries_neq_zero_function_neq_zero (z : ℍ') (f : Holℍ)
 (hp : (pseries_of_holomorphic f z) ≠ 0): 
 f.val ≠ (0 : ℍ' → ℂ) :=
 begin
-  by_contradiction,
+  intro h,
   have hc : (pseries_of_holomorphic f z) = 0,
   {
     have j : extend_by_zero f.val = 0,
@@ -151,8 +149,9 @@ begin
 sorry,
 end
 
+
 lemma function_neq_zero_forall_z_pseries_neq_zero (f : Holℍ)
-(hf : f ≠ (0)) : ∀ z : ℍ', (pseries_of_holomorphic f z) ≠ 0 :=
+(hf : f ≠ 0) : ∀ z : ℍ', (pseries_of_holomorphic f z) ≠ 0 :=
 begin
 intro z,
 have it : f.val ≠ (0 : ℍ' → ℂ),
@@ -160,20 +159,17 @@ have it : f.val ≠ (0 : ℍ' → ℂ),
   simp only [subtype.val_eq_coe, ne.def, subring.coe_eq_zero_iff],
   exact hf,
 },
-by_contradiction,
-have hc : (extend_by_zero f.val) = 0,
+intro h,
+apply it,
+apply extend_by_zero_f_eq_zero,
+set F := pseries_of_holomorphic f z with hF,
+have G : has_fpower_series_at (extend_by_zero f.val) F z,
 {
-  set F := pseries_of_holomorphic f z with hF,
-  have G : has_fpower_series_at (extend_by_zero f.val) F z,
-  {
-    apply pseries_of_holomorphic_def,
-  },
-  rw h at G,
-  have l := has_fpower_series_at.eventually_eq_zero G,
-  exact has_fpower_series_at.eventually_eq_zero_everywhere f z G l,
+  apply pseries_of_holomorphic_def,
 },
-have hcc : f.val = 0 := by exact extend_by_zero_f_eq_zero f.val hc,
-exact it hcc,
+rw h at G,
+have l := has_fpower_series_at.eventually_eq_zero G,
+exact has_fpower_series_at.eventually_eq_zero_everywhere f z G l,
 end
 
 instance : is_domain Holℍ := 
@@ -207,18 +203,52 @@ instance : is_domain Holℍ :=
       apply pseries_of_holomorphic_def,
     },
     have rg := function_neq_zero_forall_z_pseries_neq_zero g hg_ne_zero,
-    have tg : G ≠ 0,
-    {
-      have := rg (⟨i, by sorry⟩ : ℍ'),
-      assumption,
-    },
+    have tg : G ≠ 0 := rg (⟨i, by sorry⟩ : ℍ'),
     have ef := has_fpower_series_at.locally_ne_zero Fp tf,
     have eg := has_fpower_series_at.locally_ne_zero Gp tg,
 
     have aux1 : (extend_by_zero f.val) * (extend_by_zero g.val) ≠ 0,
     {
-
-      sorry,
+      rcases ef with ⟨U, ⟨hU, ⟨V, ⟨hV,hfUV⟩⟩⟩⟩,
+      rcases eg with ⟨U', ⟨hU', ⟨V', ⟨hV',hgUV'⟩⟩⟩⟩,
+      simp at hfUV hgUV' hV hV',
+      let W := V ∩ V',
+      have hkey : ∃ w, w ∈ U ∩ W ∧ w ≠ i,
+      {
+        sorry
+      },
+      simp,
+      rcases hkey with ⟨w, hwUW, hwi⟩,
+      have hfw : extend_by_zero f.val w ≠ 0,
+      {
+        have : w ∈ U ∩ V,
+        {
+          sorry
+        },
+        rw ← hfUV at this,
+        simpa using this,
+      },
+      have hgw : extend_by_zero g.val w ≠ 0,
+      {
+        have : w ∈ U' ∩ V',
+        {
+          sorry
+        },
+        rw ← hgUV' at this,
+        simpa using this,
+      },
+      have hfgw : (extend_by_zero f.val * extend_by_zero g.val) w ≠ 0,
+      {
+        change extend_by_zero f.val w * extend_by_zero g.val w ≠ 0,
+        exact mul_ne_zero hfw hgw,
+      },
+      intro hc,
+      apply hfgw,
+      have hc' : (extend_by_zero ↑f * extend_by_zero ↑g) w = (0 : ℂ → ℂ) w,
+      {
+        rw hc,
+      },
+      simpa using hc,
     },
     have aux2 : extend_by_zero (f.val * g.val) ≠ 0,
     {
@@ -230,9 +260,7 @@ instance : is_domain Holℍ :=
       exact extend_by_zero_f_neq_zero (f.val * g.val) aux2,
     },
     simp only [subtype.val_eq_coe] at aux3,
-    sorry,
-    --simp only [coe_subtype] at aux3,
-    --exact aux3,
+    norm_cast at aux3,
   },
   exact hc q,
   end,
