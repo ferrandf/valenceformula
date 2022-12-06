@@ -74,7 +74,7 @@ end
 
 
 
-def open_subs:=topological_space.opens ℂ
+def open_subs := topological_space.opens ℂ
 
 /--A function is Holomorphic on an open subset of the complex numbers, if for every point in the domain
 there is a neibourhood around the point containing the derivative of the function. In order to make it work

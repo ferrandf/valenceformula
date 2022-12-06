@@ -220,7 +220,7 @@ def weakly_modular_submodule (k : ℤ)  (Γ : subgroup SL(2,ℤ)): submodule ℂ
 
 
 
-  class is_modular_form_weight_k (k : ℤ) (Γ : subgroup SL(2,ℤ)) (f : ℂ → ℂ) : Prop :=
+class is_modular_form_weight_k (k : ℤ) (Γ : subgroup SL(2,ℤ)) (f : ℂ → ℂ) : Prop :=
   (hol : is_holomorphic_on_ℍ f)
   (subm : ↑f ∈ weakly_modular_submodule k Γ)
 
@@ -234,7 +234,7 @@ def space_of_modular_forms_weight_k (k : ℤ) (Γ : subgroup SL(2,ℤ)) : submod
 
 instance : has_mem Merℍ (submodule ℂ (ℂ → ℂ)) := ⟨λ f V, (λ z, (f.numerator.val z / f.denominator.val.val z)) ∈ V⟩
 
-  class is_meromorphic_modular_form_weight_k (k : ℤ) (f : Merℍ) : Prop :=
+class is_meromorphic_modular_form_weight_k (k : ℤ) (f : Merℍ) : Prop :=
   (subm : f ∈ weakly_modular_submodule k Γ)
 
 

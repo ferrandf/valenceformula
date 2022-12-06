@@ -10,6 +10,7 @@ import geometry.manifold.mfderiv
 import .upper_half_plane_manifold
 import .hol_bdd
 import number_theory.modular_forms.slash_actions
+import number_theory.modular_forms.slash_invariant_forms
 
 open complex
 
@@ -18,7 +19,7 @@ open_locale topological_space manifold
 
 noncomputable theory
 
-namespace modular_forms
+open modular_form
 
 open_locale upper_half_plane
 
@@ -55,8 +56,56 @@ rw ←this,
 ring,
 end
 
-localized "notation (name := modular_forms.slash) f ` ∣[`:100 k `]`:0 γ :100 :=
-  modular_forms.slash k γ f" in modular_forms
+open modular_form
+
+variables (Γ : subgroup SL(2,ℤ)) (C : GL(2, ℝ)⁺) (k: ℤ) (f : (ℍ → ℂ))
+
+localized "notation  f  ` ∣[`:100 k `]`:0 γ :100 := slash k γ f" in modular_form
+
+def weakly_modular_weight_k (k : ℤ) (Γ : subgroup SL(2,ℤ)) (f : ℍ' → ℂ) :=
+  ∀ (γ : Γ),  (f ∣[k] (γ : SL(2, ℝ))) = f
+
+lemma zero_weakly_modular (k : ℤ) (Γ : subgroup SL(2,ℤ)) : weakly_modular_weight_k k Γ (0 : ℍ' → ℂ) :=
+begin
+intro γ,
+
+sorry,
+end
+
+def weakly_modular_submodule_weight_k (k : ℤ) (Γ : subgroup SL(2,ℤ)) : submodule ℂ (ℍ' → ℂ) := {
+  carrier := weakly_modular_weight_k k Γ,
+  zero_mem' := by {
+    dsimp,
+  },
+  add_mem' := _,
+  smul_mem' := _,
+}
+
+class modular_form_weight_k (k : ℤ) (Γ : subgroup SL(2,ℤ)) (f : ℍ' → ℂ) : Prop :=
+  (hol : f ∈ Holℍ)
+  (weak : weakly_modular_weight_k k Γ f)
+
+instance : has_mem Merℍ (submodule ℂ (ℍ' → ℂ)) := ⟨λ f V, (λ z, (f.numerator.val z / f.denominator.val.val z)) ∈ V⟩
+
+class meromorphic_modular_form_weight_k (k : ℤ) (Γ : subgroup SL(2,ℤ)) (f : Merℍ) : Prop :=
+  (weak : f ∈ weakly_modular_submodule_weight_k k Γ)
+
+def space_of_modular_forms_weight_k (k : ℤ) (Γ : subgroup SL(2,ℤ)) : submodule ℂ (ℍ' → ℂ) := { 
+  carrier := modular_form_weight_k k Γ,
+  add_mem' := _,
+  zero_mem' := _,
+  smul_mem' := _,
+  }
+
+
+def space_of_mer_modular_forms_weight_k (k : ℤ) (Γ : subgroup SL(2,ℤ)) : submodule ℂ (ℍ' → ℂ) := {
+  carrier := {f : Merℍ | weakly_modular_weight_k k Γ f.val},
+  add_mem' := _,
+  zero_mem' := _,
+  smul_mem' := _,
+}
+
+
 
 def weakly_modular_submodule (k : ℤ)  (Γ : subgroup SL(2,ℤ)): submodule ℂ (ℍ  → ℂ) := {
   carrier := {f : (ℍ → ℂ) | ∀ (γ : Γ),  (f ∣[k] (γ : GL(2, ℝ)⁺)) = f },
@@ -161,7 +210,5 @@ end
 /--The extension of a function from `ℍ` to `ℍ'`-/
 def hol_extn (f : ℍ → ℂ) : ℍ' → ℂ := λ (z : ℍ'), (f (z : ℍ) )
 
-instance : has_coe (ℍ → ℂ) (ℍ' → ℂ) :=
-⟨λ f, hol_extn f ⟩
 
-end modular_forms
+

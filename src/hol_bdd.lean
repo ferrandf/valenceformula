@@ -9,6 +9,7 @@ import .upper_half_plane_manifold
 import .holomorphic_functions
 import analysis.complex.basic
 import analysis.analytic.isolated_zeros
+import analysis.analytic.uniqueness
 
 
 
@@ -62,6 +63,19 @@ begin
   exact ⟨rfl.subset, open_univ, sorry⟩,--⟨z, by finish⟩⟩,
 end
 
+lemma analytic_on_of_holomorphic (f : ℍ' → ℂ) [h : is_holomorphic_bdd f] : 
+analytic_on ℂ (extend_by_zero f) ℍ' :=
+begin
+  have hf : differentiable_on ℂ (extend_by_zero f) (upper_half_space),
+  { 
+    have j := (is_holomorphic_on_iff_differentiable_on ℍ' f),
+    dsimp at j,
+    exact iff.elim_right j h.diff,
+  },
+  apply differentiable_on.analytic_on hf,
+  exact upper_half_plane_is_open,
+end
+
 variables (f : ℍ' → ℂ) [is_holomorphic_bdd f] (z : ℍ')
 
 noncomputable def pseries_of_holomorphic := classical.some (analytic_of_holomorphic f z)
@@ -94,7 +108,7 @@ lemma const_is_bounded (c : ℂ) : is_bounded_at_im_infty (λ z : ℍ', c) :=
 noncomputable def Holℍ : subring (ℍ' → ℂ) := {
   carrier := is_holomorphic_bdd,
   mul_mem' := λ f g hf hg, ⟨mul_hol f g hf.diff hg.diff, 
-  prod_of_bounded_is_bounded hf.bdd_at_infty hg.bdd_at_infty⟩,
+  is_bounded_at_im_infty.mul hf.bdd_at_infty hg.bdd_at_infty⟩,
   one_mem' := ⟨one_hol ℍ', const_is_bounded 1⟩,
   add_mem' := λ f g hf hg, ⟨add_hol f g hf.diff hg.diff,
   hf.bdd_at_infty.add hg.bdd_at_infty⟩,
@@ -106,11 +120,6 @@ instance is_holomorphic_on' (f : Holℍ) : is_holomorphic_bdd f :=
 subring.mem_carrier.mpr f.property
 
 def Holℍ.order (f : Holℍ) (z : ℍ) : ℤ := @hol_order f.val f.property z
-
-/-- A one-dimensional formal multilinear series representing the zero function is zero. 
-lemma has_fpower_series_at.eq_zero {p : formal_multilinear_series 𝕜 𝕜 E} {x : 𝕜}
-  (h : has_fpower_series_at 0 p x) : p = 0 :=
-by { ext n x, rw ←mk_pi_field_apply_one_eq_self (p n), simp [h.apply_eq_zero n 1] }-/
 
 lemma pseries_neq_zero_function_neq_zero (z : ℍ') (f : Holℍ)  
 (hp : (pseries_of_holomorphic f z) ≠ 0): 
@@ -134,18 +143,28 @@ begin
   exact hp hc,
 end
 
-/-lemma has_fpower_series_at.eventually_eq_zero
-  (hf : has_fpower_series_at f (0 : formal_multilinear_series 𝕜 E F) x) :
-  ∀ᶠ z in 𝓝 x, f z = 0 :=
-let ⟨r, hr⟩ := hf in hr.eventually_eq_zero-/
+lemma preconn_ℍ' : is_preconnected upper_half_space :=
+begin
+sorry,
+end
 
-lemma has_fpower_series_at.eventually_eq_zero_everywhere (f : Holℍ) 
-  {p : formal_multilinear_series ℂ ℂ ℂ} (x : ℍ')
-  (hf : has_fpower_series_at (extend_by_zero f.val) (p) (x : ℂ)) 
-  (hF : ∀ᶠ z in 𝓝 x, (extend_by_zero f.val) z = 0):
+lemma hol_bdd.eventually_eq_zero_everywhere (f : Holℍ) 
+  (x : ℍ') (hF : ∀ᶠ z in 𝓝 x, (extend_by_zero f.val) z = 0):
   (extend_by_zero f.val) = (0 : ℂ → ℂ) :=
 begin
+have hf : analytic_on ℂ (extend_by_zero f.val) ℍ',
+{
+  --exact analytic_on_of_holomorphic f,
+  sorry,
+},
+have tf : ∀ ⦃y⦄, y ∈ upper_half_space → (extend_by_zero f.val) y = (0 : ℂ → ℂ) y,
+{
+  exact analytic_on.eq_on_zero_of_preconnected_of_eventually_eq_zero hf preconn_ℍ' x.prop hF,
+},
 
+
+simp at tf,
+simp,
 sorry,
 end
 
@@ -163,47 +182,49 @@ intro h,
 apply it,
 apply extend_by_zero_f_eq_zero,
 set F := pseries_of_holomorphic f z with hF,
-have G : has_fpower_series_at (extend_by_zero f.val) F z,
-{
-  apply pseries_of_holomorphic_def,
-},
+have G : has_fpower_series_at (extend_by_zero f.val) F z := by {apply pseries_of_holomorphic_def},
 rw h at G,
 have l := has_fpower_series_at.eventually_eq_zero G,
-exact has_fpower_series_at.eventually_eq_zero_everywhere f z G l,
+exact hol_bdd.eventually_eq_zero_everywhere f z l,
 end
+
+/-
+@[simp] lemma eventually_mem_nhds {s : set α} {a : α} :
+  (∀ᶠ x in 𝓝 a, s ∈ 𝓝 x) ↔ s ∈ 𝓝 a :=
+eventually_eventually_nhds
+-/
+
+lemma hkey (z : ℂ) (U V V': set ℂ) (hU : U ∈ 𝓝 z) 
+(hV : {z}ᶜ ⊆ V) (hV' : {z}ᶜ ⊆ V') : 
+∃ (w : ℂ), w ∈ U ∩ (V ∩ V') ∧ w ≠ z :=
+begin
+have r : ∀ᶠ x in 𝓝 z, U ∈ 𝓝 x,
+{
+  rw eventually_mem_nhds,
+  exact hU,
+},
+
+sorry,
+end 
 
 instance : is_domain Holℍ := 
 { eq_zero_or_eq_zero_of_mul_eq_zero := 
   begin
   intros f g q,
-  have hf := f.prop,
-  have hff : is_holomorphic_bdd f.val := by assumption,
-  have hg := g.prop,
-  have hgg : is_holomorphic_bdd g.val := by assumption,
   by_contradiction,
   push_neg at h,
   cases h with hf_ne_zero hg_ne_zero,
   have hc : f * g ≠ 0,
   {
-    have i := (⟨0, 1⟩ : ℂ),
-    set F := pseries_of_holomorphic f (⟨i, by sorry⟩ : ℍ') with hF,
-    have Fp : has_fpower_series_at (extend_by_zero f.val) F i,
-    {
-      apply pseries_of_holomorphic_def,
-    },
+    let i := (⟨0, 1⟩ : ℂ),--(⟨(⟨0, 1⟩ : ℂ), by {simp,} ⟩ : ℍ),
+    set F := pseries_of_holomorphic f (⟨i, by {simp,} ⟩ : ℍ) with hF,
+    have Fp : has_fpower_series_at (extend_by_zero f.val) F i := by {apply pseries_of_holomorphic_def},
     have rf := function_neq_zero_forall_z_pseries_neq_zero f hf_ne_zero,
-    have tf : F ≠ 0,
-    {
-      have := rf (⟨i, by sorry⟩ : ℍ'),
-      assumption,
-    },
-    set G := pseries_of_holomorphic g (⟨i, by sorry⟩ : ℍ') with hG,
-    have Gp : has_fpower_series_at (extend_by_zero g.val) G i,
-    {
-      apply pseries_of_holomorphic_def,
-    },
+    have tf : F ≠ 0 := rf (⟨i, by {simp,} ⟩ : ℍ),
+    set G := pseries_of_holomorphic g (⟨i, by {simp,} ⟩ : ℍ) with hG,
+    have Gp : has_fpower_series_at (extend_by_zero g.val) G i := by {apply pseries_of_holomorphic_def},
     have rg := function_neq_zero_forall_z_pseries_neq_zero g hg_ne_zero,
-    have tg : G ≠ 0 := rg (⟨i, by sorry⟩ : ℍ'),
+    have tg : G ≠ 0 := rg (⟨i, by {simp,} ⟩ : ℍ),
     have ef := has_fpower_series_at.locally_ne_zero Fp tf,
     have eg := has_fpower_series_at.locally_ne_zero Gp tg,
 
@@ -213,17 +234,20 @@ instance : is_domain Holℍ :=
       rcases eg with ⟨U', ⟨hU', ⟨V', ⟨hV',hgUV'⟩⟩⟩⟩,
       simp at hfUV hgUV' hV hV',
       let W := V ∩ V',
-      have hkey : ∃ w, w ∈ U ∩ W ∧ w ≠ i,
+      have hk : ∃ w, w ∈ U ∩ W ∧ w ≠ i,
       {
-        sorry
+        exact hkey i U V V' hU hV hV',
       },
       simp,
-      rcases hkey with ⟨w, hwUW, hwi⟩,
+      rcases hk with ⟨w, hwUW, hwi⟩,
       have hfw : extend_by_zero f.val w ≠ 0,
       {
         have : w ∈ U ∩ V,
         {
-          sorry
+          simp at hwUW,
+          split,
+          exact hwUW.1,
+          exact hwUW.2.1,
         },
         rw ← hfUV at this,
         simpa using this,
@@ -232,6 +256,7 @@ instance : is_domain Holℍ :=
       {
         have : w ∈ U' ∩ V',
         {
+           
           sorry
         },
         rw ← hgUV' at this,
@@ -284,7 +309,7 @@ is_bounded_at_im_infty (λ z : ℍ, c * f z) :=
 begin
 let h : ℍ' → ℂ := λ z, c,
 let j := const_is_bounded c,
-exact prod_of_bounded_is_bounded j hf,
+exact is_bounded_at_im_infty.mul j hf,
 end
 
 instance : has_smul ℂ Holℍ := 
