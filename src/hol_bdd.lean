@@ -194,23 +194,60 @@ end
 eventually_eventually_nhds
 -/
 
+example (z : ℂ) (U : set ℂ) (hU : is_open U) (hz : z ∈ U): (U ∩ {z}ᶜ).nonempty :=
+begin
+rw metric.is_open_iff at hU,
+specialize hU z hz,
+rcases hU with ⟨ε, ⟨hε1, hε2⟩⟩,
+use z + ε/2,
+apply mem_inter,
+{
+  apply hε2,
+  simp,
+  rw abs_of_pos hε1,
+  linarith,
+},
+{
+  simp,
+  exact ne_of_gt hε1,
+}
+end
+
+
 lemma hkey (z : ℂ) (U V V': set ℂ) (hU : U ∈ 𝓝 z) 
 (hV : {z}ᶜ ⊆ V) (hV' : {z}ᶜ ⊆ V') : 
 ∃ (w : ℂ), w ∈ U ∩ (V ∩ V') ∧ w ≠ z :=
 begin
-have r : ∀ᶠ x in 𝓝 z, U ∈ 𝓝 x,
+rw mem_nhds_iff at hU,
+rcases hU with ⟨hU',⟨hU'V,is_open_hU', hzU'⟩⟩,
+rw metric.is_open_iff at is_open_hU',
+specialize is_open_hU' z hzU',
+rcases is_open_hU' with ⟨ε, ⟨hε1, hε2⟩⟩,
+use z + ε/2,
+split,
 {
-  rw eventually_mem_nhds,
-  exact hU,
+  apply mem_inter,
+  {
+    apply hU'V,
+    apply hε2,
+    simp,
+    rw abs_of_pos hε1,
+    linarith,
+  },
+  {
+    apply (subset_inter hV hV'),
+    simp,
+    exact ne_of_gt hε1,
+  }
 },
+{
+  simp,
+  exact ne_of_gt hε1,
+}
+end
 
-sorry,
-end 
-
-instance : is_domain Holℍ := 
-{ eq_zero_or_eq_zero_of_mul_eq_zero := 
-  begin
-  intros f g q,
+lemma eq_zero_or_eq_zero_of_mul_eq_zero (f g : Holℍ) (q : f * g = 0) : f = 0 ∨ g = 0 :=
+begin
   by_contradiction,
   push_neg at h,
   cases h with hf_ne_zero hg_ne_zero,
@@ -234,21 +271,16 @@ instance : is_domain Holℍ :=
       rcases eg with ⟨U', ⟨hU', ⟨V', ⟨hV',hgUV'⟩⟩⟩⟩,
       simp at hfUV hgUV' hV hV',
       let W := V ∩ V',
-      have hk : ∃ w, w ∈ U ∩ W ∧ w ≠ i,
+      have hk : ∃ w, w ∈ (U ∩ U') ∩ W ∧ w ≠ i,
       {
-        exact hkey i U V V' hU hV hV',
+        refine hkey i (U ∩ U') V V' _ hV hV',
+        sorry
       },
       simp,
       rcases hk with ⟨w, hwUW, hwi⟩,
       have hfw : extend_by_zero f.val w ≠ 0,
       {
-        have : w ∈ U ∩ V,
-        {
-          simp at hwUW,
-          split,
-          exact hwUW.1,
-          exact hwUW.2.1,
-        },
+        have : w ∈ U ∩ V  := ⟨hwUW.1, hwUW.2.1⟩,
         rw ← hfUV at this,
         simpa using this,
       },
@@ -256,8 +288,10 @@ instance : is_domain Holℍ :=
       {
         have : w ∈ U' ∩ V',
         {
-           
-          sorry
+          --apply mem_inter _ hwUW.2.2,
+          rw ← hgUV',
+          simp,
+          
         },
         rw ← hgUV' at this,
         simpa using this,
@@ -288,21 +322,23 @@ instance : is_domain Holℍ :=
     norm_cast at aux3,
   },
   exact hc q,
-  end,
-  exists_pair_ne := 
-  begin
-  use (λ z : ℍ', 0),
-  split,
-  exact zero_hol ℍ',
-  exact const_is_bounded 0,
-  use (λ z : ℍ', 1),
-  split,
-  exact one_hol ℍ',
-  exact const_is_bounded 1,
-  simp only [ne.def, subtype.mk_eq_mk, function.const_inj, zero_ne_one, not_false_iff],
-  end
-}
+end
 
+instance : is_domain Holℍ := {
+  mul_left_cancel_of_ne_zero := sorry,
+  mul_right_cancel_of_ne_zero := sorry,
+  exists_pair_ne :=
+  begin
+    use (λ z : ℍ', 0),
+    split,
+    exact zero_hol ℍ',
+    exact const_is_bounded 0,
+    use (λ z : ℍ', 1),
+    split,
+    exact one_hol ℍ',
+    exact const_is_bounded 1,
+    simp only [ne.def, subtype.mk_eq_mk, function.const_inj, zero_ne_one, not_false_iff],
+  end }
 
 lemma bounded_at_im_infty.smul {f : ℍ' → ℂ} (c : ℂ) (hf : is_bounded_at_im_infty f) : 
 is_bounded_at_im_infty (λ z : ℍ, c * f z) :=
