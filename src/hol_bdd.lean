@@ -10,6 +10,7 @@ import .holomorphic_functions
 import analysis.complex.basic
 import analysis.analytic.isolated_zeros
 import analysis.analytic.uniqueness
+import algebra.ring.defs
 
 
 
@@ -188,12 +189,6 @@ have l := has_fpower_series_at.eventually_eq_zero G,
 exact hol_bdd.eventually_eq_zero_everywhere f z l,
 end
 
-/-
-@[simp] lemma eventually_mem_nhds {s : set α} {a : α} :
-  (∀ᶠ x in 𝓝 a, s ∈ 𝓝 x) ↔ s ∈ 𝓝 a :=
-eventually_eventually_nhds
--/
-
 example (z : ℂ) (U : set ℂ) (hU : is_open U) (hz : z ∈ U): (U ∩ {z}ᶜ).nonempty :=
 begin
 rw metric.is_open_iff at hU,
@@ -246,7 +241,7 @@ split,
 }
 end
 
-lemma eq_zero_or_eq_zero_of_mul_eq_zero (f g : Holℍ) (q : f * g = 0) : f = 0 ∨ g = 0 :=
+lemma Holℍ_eq_zero_or_eq_zero_of_mul_eq_zero (f g : Holℍ) (q : f * g = 0) : f = 0 ∨ g = 0 :=
 begin
   by_contradiction,
   push_neg at h,
@@ -254,14 +249,14 @@ begin
   have hc : f * g ≠ 0,
   {
     let i := (⟨0, 1⟩ : ℂ),--(⟨(⟨0, 1⟩ : ℂ), by {simp,} ⟩ : ℍ),
-    set F := pseries_of_holomorphic f (⟨i, by {simp,} ⟩ : ℍ) with hF,
+    set F := pseries_of_holomorphic f (⟨i, by {simp only [zero_lt_one],} ⟩ : ℍ) with hF,
     have Fp : has_fpower_series_at (extend_by_zero f.val) F i := by {apply pseries_of_holomorphic_def},
     have rf := function_neq_zero_forall_z_pseries_neq_zero f hf_ne_zero,
-    have tf : F ≠ 0 := rf (⟨i, by {simp,} ⟩ : ℍ),
-    set G := pseries_of_holomorphic g (⟨i, by {simp,} ⟩ : ℍ) with hG,
+    have tf : F ≠ 0 := rf (⟨i, by {simp only [zero_lt_one],} ⟩ : ℍ),
+    set G := pseries_of_holomorphic g (⟨i, by {simp only [zero_lt_one],} ⟩ : ℍ) with hG,
     have Gp : has_fpower_series_at (extend_by_zero g.val) G i := by {apply pseries_of_holomorphic_def},
     have rg := function_neq_zero_forall_z_pseries_neq_zero g hg_ne_zero,
-    have tg : G ≠ 0 := rg (⟨i, by {simp,} ⟩ : ℍ),
+    have tg : G ≠ 0 := rg (⟨i, by {simp only [zero_lt_one],} ⟩ : ℍ),
     have ef := has_fpower_series_at.locally_ne_zero Fp tf,
     have eg := has_fpower_series_at.locally_ne_zero Gp tg,
 
@@ -269,30 +264,25 @@ begin
     {
       rcases ef with ⟨U, ⟨hU, ⟨V, ⟨hV,hfUV⟩⟩⟩⟩,
       rcases eg with ⟨U', ⟨hU', ⟨V', ⟨hV',hgUV'⟩⟩⟩⟩,
-      simp at hfUV hgUV' hV hV',
+      simp only [filter.mem_principal, subtype.val_eq_coe, ne.def] at hfUV hgUV' hV hV',
       let W := V ∩ V',
       have hk : ∃ w, w ∈ (U ∩ U') ∩ W ∧ w ≠ i,
       {
         refine hkey i (U ∩ U') V V' _ hV hV',
-        sorry
+        simp only [filter.inter_mem_iff],
+        exact ⟨hU, hU'⟩,
       },
-      simp,
+      simp only [subtype.val_eq_coe, ne.def],
       rcases hk with ⟨w, hwUW, hwi⟩,
       have hfw : extend_by_zero f.val w ≠ 0,
       {
-        have : w ∈ U ∩ V  := ⟨hwUW.1, hwUW.2.1⟩,
+        have : w ∈ U ∩ V  := ⟨hwUW.1.1, hwUW.2.1⟩,
         rw ← hfUV at this,
         simpa using this,
       },
       have hgw : extend_by_zero g.val w ≠ 0,
       {
-        have : w ∈ U' ∩ V',
-        {
-          --apply mem_inter _ hwUW.2.2,
-          rw ← hgUV',
-          simp,
-          
-        },
+        have : w ∈ U' ∩ V' := ⟨hwUW.1.2, hwUW.2.2⟩, 
         rw ← hgUV' at this,
         simpa using this,
       },
@@ -324,9 +314,31 @@ begin
   exact hc q,
 end
 
+-- Holℍ is an integral domain
+
 instance : is_domain Holℍ := {
-  mul_left_cancel_of_ne_zero := sorry,
-  mul_right_cancel_of_ne_zero := sorry,
+  mul_left_cancel_of_ne_zero := 
+  begin
+    intros f g h hyp1 hyp2,
+    have : f*g - f*h = 0 := sub_eq_zero_of_eq hyp2,
+    have : f * (g-h) = 0,
+    {
+      rw [mul_sub, this],
+    },
+    have : g - h = 0, from (Holℍ_eq_zero_or_eq_zero_of_mul_eq_zero f (g-h) this).resolve_left hyp1,
+    exact eq_of_sub_eq_zero this,
+  end,
+  mul_right_cancel_of_ne_zero := 
+  begin
+    intros f g h hyp1 hyp2,
+      have : f * g - h * g = 0 := sub_eq_zero_of_eq hyp2,
+      have : (f - h) * g = 0,
+      {
+        rw [sub_mul, this],
+      },
+      have : f - h = 0, from (Holℍ_eq_zero_or_eq_zero_of_mul_eq_zero (f-h) g this).resolve_right hyp1,
+      exact eq_of_sub_eq_zero this,
+  end,
   exists_pair_ne :=
   begin
     use (λ z : ℍ', 0),
@@ -403,6 +415,12 @@ def Merℍ.numerator (F : Merℍ) : Holℍ :=
 
 def Merℍ.denominator (F : Merℍ) : (non_zero_divisors Holℍ) :=
 ((monoid_of _).sec F).2
+
+instance tst (F : Merℍ) : (F : ℍ' → ℂ) :=
+begin
+
+sorry,
+end
 
 --Given F = f/g a meromorphic function and z ∈ ℍ, we can compute the order of F at z as
 --the difference of the order of f and the order of g.

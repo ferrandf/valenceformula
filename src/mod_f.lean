@@ -63,27 +63,40 @@ variables (Γ : subgroup SL(2,ℤ)) (C : GL(2, ℝ)⁺) (k: ℤ) (f : (ℍ → �
 localized "notation  f  ` ∣[`:100 k `]`:0 γ :100 := slash k γ f" in modular_form
 
 def weakly_modular_weight_k (k : ℤ) (Γ : subgroup SL(2,ℤ)) (f : ℍ' → ℂ) :=
-  ∀ (γ : Γ),  (f ∣[k] (γ : SL(2, ℝ))) = f
+  ∀ (γ : Γ),  (f ∣[k] (γ : GL(2, ℝ)⁺)) = f
 
 lemma zero_weakly_modular (k : ℤ) (Γ : subgroup SL(2,ℤ)) : weakly_modular_weight_k k Γ (0 : ℍ' → ℂ) :=
 begin
 intro γ,
-
+simp,
 sorry,
 end
 
 def weakly_modular_submodule_weight_k (k : ℤ) (Γ : subgroup SL(2,ℤ)) : submodule ℂ (ℍ' → ℂ) := {
   carrier := weakly_modular_weight_k k Γ,
-  zero_mem' := by {
-    dsimp,
+  zero_mem' := by {exact zero_weakly_modular k Γ},
+  add_mem' := by {
+    intros f g hf hg,
+    intro γ,
+    have hff:= hf γ,
+    have hgg:= hg γ,
+    rw slash_add k γ f g,
+    rw [hff, hgg],
   },
-  add_mem' := _,
-  smul_mem' := _,
+  smul_mem' := by {
+    intros c f hf,
+    intro γ,
+    have hff:= hf γ,
+    have : (c • f)  ∣[k] γ = c • (f  ∣[k] γ ),
+    by {apply smul_slash},
+    rw hff at this,
+    apply this,
+  },
 }
 
 class modular_form_weight_k (k : ℤ) (Γ : subgroup SL(2,ℤ)) (f : ℍ' → ℂ) : Prop :=
   (hol : f ∈ Holℍ)
-  (weak : weakly_modular_weight_k k Γ f)
+  (weak : f ∈ weakly_modular_submodule_weight_k k Γ)
 
 instance : has_mem Merℍ (submodule ℂ (ℍ' → ℂ)) := ⟨λ f V, (λ z, (f.numerator.val z / f.denominator.val.val z)) ∈ V⟩
 
@@ -92,54 +105,28 @@ class meromorphic_modular_form_weight_k (k : ℤ) (Γ : subgroup SL(2,ℤ)) (f :
 
 def space_of_modular_forms_weight_k (k : ℤ) (Γ : subgroup SL(2,ℤ)) : submodule ℂ (ℍ' → ℂ) := { 
   carrier := modular_form_weight_k k Γ,
-  add_mem' := _,
-  zero_mem' := _,
-  smul_mem' := _,
+  add_mem' := λ f g hf hg, ⟨Holℍ.add_mem' hf.hol hg.hol, (weakly_modular_submodule_weight_k k Γ).add_mem' hf.weak hg.weak⟩,
+  zero_mem' := ⟨Holℍ.zero_mem', zero_weakly_modular k Γ⟩,
+  smul_mem' := λ c f hf, ⟨sorry/-Holℍ.has_smul.smul c hf.hol-/, (weakly_modular_submodule_weight_k k Γ).smul_mem' c hf.weak⟩,
   }
 
 
 def space_of_mer_modular_forms_weight_k (k : ℤ) (Γ : subgroup SL(2,ℤ)) : submodule ℂ (ℍ' → ℂ) := {
-  carrier := {f : Merℍ | weakly_modular_weight_k k Γ f.val},
+  carrier := {f : Merℍ | f ∈ weakly_modular_submodule_weight_k k Γ},
   add_mem' := _,
   zero_mem' := _,
   smul_mem' := _,
 }
 
 
-
-def weakly_modular_submodule (k : ℤ)  (Γ : subgroup SL(2,ℤ)): submodule ℂ (ℍ  → ℂ) := {
-  carrier := {f : (ℍ → ℂ) | ∀ (γ : Γ),  (f ∣[k] (γ : GL(2, ℝ)⁺)) = f },
-  zero_mem' := by {simp only [set.mem_set_of_eq, coe_coe],
-  simp_rw slash,
-  simp only [forall_const, zero_mul, pi.zero_apply],
-  refl, },
-  add_mem' := by {intros f g hf hg,
-  simp only [set.mem_set_of_eq, coe_coe] at *,
-  intro γ,
-  have hff:= hf γ,
-  have hgg:= hg γ,
-  rw [←coe_coe, ←coe_coe] at *,
-  rw slash_add k γ f g,
-  rw [hff, hgg], },
-  smul_mem' := by {intros c f hf,
-  simp only [set.mem_set_of_eq, coe_coe] at *,
-  intro γ,
-  have hff:= hf γ,
-  have : (c • f)  ∣[k] γ = c • (f  ∣[k] γ ),
-  by {apply smul_slash},
-  rw ←  coe_coe at *,
-  rw ←  coe_coe at *,
-  rw hff at this,
-  apply this,}}
-
-lemma wmodular_mem (k : ℤ) (Γ : subgroup SL(2,ℤ)) (f : ℍ → ℂ) :
-  f ∈ (weakly_modular_submodule k Γ) ↔  ∀ (γ : Γ), (f ∣[k] (γ : GL(2, ℝ)⁺)) = f := iff.rfl
+lemma wmodular_mem (k : ℤ) (Γ : subgroup SL(2,ℤ)) (f : ℍ' → ℂ) :
+  f ∈ (weakly_modular_submodule_weight_k k Γ) ↔  ∀ (γ : Γ), (f ∣[k] (γ : GL(2, ℝ)⁺)) = f := iff.rfl
 
 /--A function `f:ℍ → ℂ` is modular, of level `Γ` and weight `k ∈ ℤ`, if for every matrix in
  `γ ∈  Γ` we have `f(γ  • z)= (c*z+d)^k f(z)` where `γ= ![![a, b], ![c, d]]`,
  and it acts on `ℍ` via Moebius trainsformations. -/
-@[simp] lemma wmodular_mem' (k : ℤ) (Γ : subgroup SL(2,ℤ)) (f : ℍ → ℂ) :
-  f ∈ (weakly_modular_submodule k Γ) ↔  ∀ γ : Γ, ∀ z : ℍ,
+@[simp] lemma wmodular_mem' (k : ℤ) (Γ : subgroup SL(2,ℤ)) (f : ℍ' → ℂ) :
+  f ∈ (weakly_modular_submodule_weight_k k Γ) ↔  ∀ γ : Γ, ∀ z : ℍ,
   f ((γ : matrix.GL_pos (fin 2) ℝ) • z) = ((↑ₘγ 1 0 : ℝ) * z +(↑ₘγ 1 1 : ℝ))^k * f z :=
 begin
   simp only [wmodular_mem],
@@ -190,9 +177,9 @@ begin
   simp,
 end
 
-lemma mul_modular  (k_1 k_2 : ℤ) (Γ : subgroup SL(2,ℤ)) (f g : ℍ → ℂ)
-  (hf : f ∈  weakly_modular_submodule k_1 Γ)  (hg : g ∈ weakly_modular_submodule k_2 Γ) :
-  f * g  ∈  weakly_modular_submodule (k_1+k_2) Γ :=
+lemma mul_modular  (k_1 k_2 : ℤ) (Γ : subgroup SL(2,ℤ)) (f g : ℍ' → ℂ)
+  (hf : f ∈ weakly_modular_submodule_weight_k k_1 Γ)  (hg : g ∈ weakly_modular_submodule_weight_k k_2 Γ) :
+  f * g  ∈ weakly_modular_submodule_weight_k (k_1+k_2) Γ :=
 begin
   simp only [wmodular_mem', pi.mul_apply, coe_coe] at *,
   intros γ z,
