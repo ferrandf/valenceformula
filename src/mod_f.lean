@@ -98,7 +98,7 @@ class modular_form_weight_k (k : ℤ) (Γ : subgroup SL(2,ℤ)) (f : ℍ' → �
   (hol : f ∈ Holℍ)
   (weak : f ∈ weakly_modular_submodule_weight_k k Γ)
 
-instance : has_mem Merℍ (submodule ℂ (ℍ' → ℂ)) := ⟨λ f V, (λ z, (f.numerator.val z / f.denominator.val.val z)) ∈ V⟩
+instance : has_mem Merℍ (submodule ℂ (ℍ' → ℂ)) := ⟨λ f V, f.map ∈ V⟩
 
 class meromorphic_modular_form_weight_k (k : ℤ) (Γ : subgroup SL(2,ℤ)) (f : Merℍ) : Prop :=
   (weak : f ∈ weakly_modular_submodule_weight_k k Γ)

@@ -11,10 +11,11 @@ import analysis.complex.basic
 import analysis.analytic.isolated_zeros
 import analysis.analytic.uniqueness
 import algebra.ring.defs
-
+import .ecomplex
 
 
 open_locale classical
+open ecomplex
 noncomputable theory
 
 open_locale topological_space upper_half_plane
@@ -416,10 +417,22 @@ def Merℍ.numerator (F : Merℍ) : Holℍ :=
 def Merℍ.denominator (F : Merℍ) : (non_zero_divisors Holℍ) :=
 ((monoid_of _).sec F).2
 
-instance tst (F : Merℍ) : (F : ℍ' → ℂ) :=
-begin
+def Holℍ.zeros (f : Holℍ) := f.val ⁻¹' ({0} : set ℂ)
+def zeros (F : Merℍ) : set ℍ' := F.numerator.val ⁻¹' ({0} : set ℂ)
+def poles (F : Merℍ) : set ℍ' := F.denominator.val.val ⁻¹' ({0} : set ℂ)
 
-sorry,
+def Merℍ.map (F : Merℍ) : ℍ' → ℂ := λ z, F.numerator.val z / (F.denominator.val.val z)
+def tst' (F : Merℍ) : ℍ' → ecomplex := λ z, ite (z ∈ poles F) ⊤ ((F.map) z)
+
+/- example  (f : ℍ' → ecomplex) (S : set ℍ'.1) : ∃! F : Merℍ, tst' F = f :=
+begin
+sorry
+end
+ -/
+
+lemma discrete_iff (S : set ℂ) : (discrete_topology S) ↔ ∀ s ∈ S, ∃ (ε : ℝ), 0 < ε ∧ metric.ball s ε ∩ S = {s} :=
+begin
+  sorry
 end
 
 --Given F = f/g a meromorphic function and z ∈ ℍ, we can compute the order of F at z as
