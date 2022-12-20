@@ -418,7 +418,7 @@ def Merℍ.denominator (F : Merℍ) : (non_zero_divisors Holℍ) :=
 ((monoid_of _).sec F).2
 
 def Holℍ.zeros (f : Holℍ) := f.val ⁻¹' ({0} : set ℂ)
-def zeros (F : Merℍ) : set ℍ' := F.numerator.val ⁻¹' ({0} : set ℂ)
+def Merℍ.zeros (F : Merℍ) : set ℍ' := F.numerator.val ⁻¹' ({0} : set ℂ)
 def poles (F : Merℍ) : set ℍ' := F.denominator.val.val ⁻¹' ({0} : set ℂ)
 
 def Merℍ.map (F : Merℍ) : ℍ' → ℂ := λ z, F.numerator.val z / (F.denominator.val.val z)
@@ -432,12 +432,16 @@ end
 
 lemma discrete_iff (S : set ℂ) : (discrete_topology S) ↔ ∀ s ∈ S, ∃ (ε : ℝ), 0 < ε ∧ metric.ball s ε ∩ S = {s} :=
 begin
-  sorry
+  split,
+  intros hS s hs,
+  rw discrete_topology_iff_nhds at hS,
+  sorry,
+  sorry,
 end
 
 --Given F = f/g a meromorphic function and z ∈ ℍ, we can compute the order of F at z as
 --the difference of the order of f and the order of g.
-def meromorphic.order (F : Merℍ) (z : ℍ) : ℤ := 
+def Merℍ.order (F : Merℍ) (z : ℍ) : ℤ := 
 Holℍ.order F.numerator z - Holℍ.order F.denominator z
 
 --next step would be to give the definition of a weakly modular form on the upper half plane.

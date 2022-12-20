@@ -11,6 +11,8 @@ import .upper_half_plane_manifold
 import .hol_bdd
 import number_theory.modular_forms.slash_actions
 import number_theory.modular_forms.slash_invariant_forms
+import linear_algebra.general_linear_group
+
 
 open complex
 
@@ -57,6 +59,9 @@ ring,
 end
 
 open modular_form
+open complex matrix matrix.special_linear_group upper_half_plane
+open_locale upper_half_plane complex_conjugate
+
 
 variables (Γ : subgroup SL(2,ℤ)) (C : GL(2, ℝ)⁺) (k: ℤ) (f : (ℍ → ℂ))
 
@@ -64,6 +69,7 @@ localized "notation  f  ` ∣[`:100 k `]`:0 γ :100 := slash k γ f" in modular_
 
 def weakly_modular_weight_k (k : ℤ) (Γ : subgroup SL(2,ℤ)) (f : ℍ' → ℂ) :=
   ∀ (γ : Γ),  (f ∣[k] (γ : GL(2, ℝ)⁺)) = f
+
 
 lemma zero_weakly_modular (k : ℤ) (Γ : subgroup SL(2,ℤ)) : weakly_modular_weight_k k Γ (0 : ℍ' → ℂ) :=
 begin
@@ -94,14 +100,12 @@ def weakly_modular_submodule_weight_k (k : ℤ) (Γ : subgroup SL(2,ℤ)) : subm
   },
 }
 
+--instance : has_mem (ℍ' → ℂ) (submodule ℂ (ℍ' → ℂ)) := ⟨λ f V, f ∈ V⟩
+
+--Space of modular forms
 class modular_form_weight_k (k : ℤ) (Γ : subgroup SL(2,ℤ)) (f : ℍ' → ℂ) : Prop :=
   (hol : f ∈ Holℍ)
-  (weak : f ∈ weakly_modular_submodule_weight_k k Γ)
-
-instance : has_mem Merℍ (submodule ℂ (ℍ' → ℂ)) := ⟨λ f V, f.map ∈ V⟩
-
-class meromorphic_modular_form_weight_k (k : ℤ) (Γ : subgroup SL(2,ℤ)) (f : Merℍ) : Prop :=
-  (weak : f ∈ weakly_modular_submodule_weight_k k Γ)
+  (weak : weakly_modular_weight_k k Γ f)
 
 def space_of_modular_forms_weight_k (k : ℤ) (Γ : subgroup SL(2,ℤ)) : submodule ℂ (ℍ' → ℂ) := { 
   carrier := modular_form_weight_k k Γ,
@@ -111,14 +115,36 @@ def space_of_modular_forms_weight_k (k : ℤ) (Γ : subgroup SL(2,ℤ)) : submod
   }
 
 
-def space_of_mer_modular_forms_weight_k (k : ℤ) (Γ : subgroup SL(2,ℤ)) : submodule ℂ (ℍ' → ℂ) := {
-  carrier := {f : Merℍ | f ∈ weakly_modular_submodule_weight_k k Γ},
-  add_mem' := _,
-  zero_mem' := _,
-  smul_mem' := _,
-}
+
+-- For meromorphic functions
+def slash_mer_left (k : ℤ) (γ : SL(2,ℤ)) (f g : ℍ → ℂ) (z : ℍ) : ℂ :=
+  f(γ • z) * g(z) * (upper_half_plane.denom γ z)^(-k)
+
+def slash_mer_right (k : ℤ) (γ : SL(2,ℤ)) (f g : ℍ → ℂ) (z : ℍ) : ℂ :=
+  f(z) * g(γ • z)
+
+def weakly_meromorphic_modular_weight_k (k : ℤ) (Γ : subgroup SL(2,ℤ)) (F : Merℍ) :=
+  ∀ (γ : Γ), slash_mer_left k γ F.numerator.val F.denominator.val.val = slash_mer_right k γ F.numerator.val F.denominator.val.val
+
+instance mem_mer : has_mem Merℍ (submodule ℂ (ℍ' → ℂ)) := ⟨λ F V, F.map ∈ V⟩
+
+--Space of meromorphic_modular_forms
+
+class meromorphic_modular_form_weight_k (k : ℤ) (Γ : subgroup SL(2,ℤ)) (F : Merℍ) : Prop :=
+  (weak_mer : weakly_meromorphic_modular_weight_k k Γ F)
+
+def space_of_meromorphic_modular_forms_weight_k (k : ℤ) (Γ : subgroup SL(2,ℤ)) : submodule ℂ (ℍ' → ℂ) := {
+  carrier := meromorphic_modular_form_weight_k k Γ,
+  add_mem' := sorry,
+  zero_mem' := sorry,
+  smul_mem' := sorry,
+  }
 
 
+
+
+
+/- ---------
 lemma wmodular_mem (k : ℤ) (Γ : subgroup SL(2,ℤ)) (f : ℍ' → ℂ) :
   f ∈ (weakly_modular_submodule_weight_k k Γ) ↔  ∀ (γ : Γ), (f ∣[k] (γ : GL(2, ℝ)⁺)) = f := iff.rfl
 
@@ -198,4 +224,4 @@ end
 def hol_extn (f : ℍ → ℂ) : ℍ' → ℂ := λ (z : ℍ'), (f (z : ℍ) )
 
 
-
+-/
