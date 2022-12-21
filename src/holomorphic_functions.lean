@@ -21,6 +21,12 @@ variables {α : Type*} {β : Type*} {s : set α}
 def extend_by_zero [has_zero β] (f : s → β) : α → β :=
 λ z, if h : z ∈ s then f ⟨z, h⟩ else 0
 
+lemma extend_by_zero_eq_of_mem [has_zero β] (f : s → β) (x : α) (hx : x ∈ s):
+  (extend_by_zero f) x = f ⟨ x, hx ⟩ :=
+begin
+  rw extend_by_zero, dsimp, split_ifs, tauto,
+end
+
 lemma extend_by_zero_zero [has_zero β] :
 extend_by_zero (λ s, 0 : s → β) = (λ h, 0) :=
 by ext z; by_cases h : z ∈ s; simp [extend_by_zero, h]
@@ -69,10 +75,6 @@ lemma extend_by_zero_smul [ring β] (c : β) (f : s → β) :
   by ext z; by_cases h : z ∈ s; simp [extend_by_zero, h]
 
 end
-
-
-
-
 
 def open_subs := topological_space.opens ℂ
 
