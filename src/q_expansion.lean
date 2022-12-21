@@ -372,20 +372,25 @@ begin
   exact (modform_bound_aux c 1 c_pos bd).is_O,
 end
 
-
-lemma modform_periodic (h_mod : modular_form_weight_k k ⊤ f) (w : ℂ) :
-  (extend_by_zero f)(w + 1) = (extend_by_zero f)(w) :=
+lemma modform_periodic (h_mod : modular_form_weight_k k ⊤ f) (z : ℂ) :
+  (extend_by_zero f)(z + 1) = (extend_by_zero f)(z) :=
 begin
-  by_cases hw : 0 < im w,
-  { rw (extend_by_zero_eq_of_mem f w hw),
-    have : 0 < im (w + 1), {rw [add_im, one_im, add_zero], exact hw },
+  by_cases hz : 0 < im z,
+  { rw (extend_by_zero_eq_of_mem f z hz),
+    have : 0 < im (z + 1), {rw [add_im, one_im, add_zero], exact hz },
     rw (extend_by_zero_eq_of_mem f _ this),
     sorry,
+  },
+  {
+    sorry,
+  },
+
 end
 
-lemma modform_hol (h_mod : modular_form_weight_k k ⊤ f) (z : ℂ) (hz : 0 < im z):
+lemma modform_hol (h_mod : modular_form_weight_k k ⊤ f) (z : ℂ) (hz : 0 < im z) :
   differentiable_at ℂ (extend_by_zero f) z :=
 begin
+
   sorry,
 end
 
