@@ -50,10 +50,10 @@ lemma aux1 (a b c d e: ℂ) (k : ℤ) : (e^k)⁻¹*a^(k-1) * (b^k)⁻¹ * c^(k -
 ( (b * e)^ k)⁻¹ * (c * a)^(k-1) * d:=
 begin
 have : (b^k)⁻¹ * ((e)^ k)⁻¹ * (c)^(k-1) * (a)^(k-1) * d = ( (b * e)^ k)⁻¹ * (c * a)^(k-1) * d ,
- by  {ring_exp, rw ← mul_assoc,
+by  {ring_exp, rw ← mul_assoc,
  have:  (b * e)^ k = b^k * e^k, by {exact mul_zpow b e k,},
- simp_rw [mul_zpow],
- simp_rw [mul_inv],ring,},
+simp_rw [mul_zpow],
+simp_rw [mul_inv],ring,},
 rw ←this,
 ring,
 end
@@ -111,10 +111,9 @@ def space_of_modular_forms_weight_k (k : ℤ) (Γ : subgroup SL(2,ℤ)) : submod
   carrier := modular_form_weight_k k Γ,
   add_mem' := λ f g hf hg, ⟨Holℍ.add_mem' hf.hol hg.hol, (weakly_modular_submodule_weight_k k Γ).add_mem' hf.weak hg.weak⟩,
   zero_mem' := ⟨Holℍ.zero_mem', zero_weakly_modular k Γ⟩,
-  smul_mem' := λ c f hf, ⟨sorry/-Holℍ.has_smul.smul c hf.hol-/, (weakly_modular_submodule_weight_k k Γ).smul_mem' c hf.weak⟩,
+  smul_mem' := λ c f hf, ⟨⟨smul_hol _ _ hf.hol.diff, smul_bounded _ hf.hol.bdd_at_infty⟩,
+    (weakly_modular_submodule_weight_k k Γ).smul_mem' c hf.weak⟩,
   }
-
-
 
 -- For meromorphic functions
 def slash_mer_left (k : ℤ) (γ : SL(2,ℤ)) (f g : ℍ → ℂ) (z : ℍ) : ℂ :=
@@ -130,17 +129,18 @@ instance mem_mer : has_mem Merℍ (submodule ℂ (ℍ' → ℂ)) := ⟨λ F V, F
 
 --Space of meromorphic_modular_forms
 
-class meromorphic_modular_form_weight_k (k : ℤ) (Γ : subgroup SL(2,ℤ)) (F : Merℍ) : Prop :=
-  (weak_mer : weakly_meromorphic_modular_weight_k k Γ F)
+def Merℍwm (k : ℤ) (Γ : subgroup SL(2,ℤ)) :=
+{ F : Merℍ // weakly_meromorphic_modular_weight_k k Γ F}
 
-def space_of_meromorphic_modular_forms_weight_k (k : ℤ) (Γ : subgroup SL(2,ℤ)) : submodule ℂ (ℍ' → ℂ) := {
-  carrier := meromorphic_modular_form_weight_k k Γ,
+
+/- def space_of_meromorphic_modular_forms_weight_k (k : ℤ) (Γ : subgroup SL(2,ℤ)) : submodule ℂ (ℍ' → ℂ) := {
+  carrier := Merℍ.map '' set.univ,
   add_mem' := sorry,
   zero_mem' := sorry,
   smul_mem' := sorry,
   }
 
-
+ -/
 
 
 

@@ -99,13 +99,17 @@ lemma hol_order_well_defined {p : formal_multilinear_series ℂ ℂ ℂ}
   by simp [pseries_unique f hfp]
 
 lemma const_is_bounded (c : ℂ) : is_bounded_at_im_infty (λ z : ℍ', c) :=
-  begin
-  simp only [bounded_mem],
-  use c.abs, use 0,
-  intros z hz,
-  linarith,
-  end
+begin
+simp only [bounded_mem],
+use c.abs, use 0,
+intros z hz,
+linarith,
+end
 
+lemma smul_bounded {f : ℍ' → ℂ} (c : ℂ) (hf : is_bounded_at_im_infty f) : is_bounded_at_im_infty (c • f) :=
+begin
+apply is_bounded_at_im_infty.mul (const_is_bounded c) hf,
+end
 
 noncomputable def Holℍ : subring (ℍ' → ℂ) := {
   carrier := is_holomorphic_bdd,
