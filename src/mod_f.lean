@@ -111,7 +111,7 @@ def space_of_modular_forms_weight_k (k : ℤ) (Γ : subgroup SL(2,ℤ)) : submod
   carrier := modular_form_weight_k k Γ,
   add_mem' := λ f g hf hg, ⟨Holℍ.add_mem' hf.hol hg.hol, (weakly_modular_submodule_weight_k k Γ).add_mem' hf.weak hg.weak⟩,
   zero_mem' := ⟨Holℍ.zero_mem', zero_weakly_modular k Γ⟩,
-  smul_mem' := λ c f hf, ⟨⟨smul_hol _ _ hf.hol.diff, smul_bounded _ hf.hol.bdd_at_infty⟩,
+  smul_mem' := λ c f hf, ⟨⟨smul_hol _ _ hf.hol.diff, bounded_at_im_infty.smul _ hf.hol.bdd_at_infty⟩,
     (weakly_modular_submodule_weight_k k Γ).smul_mem' c hf.weak⟩,
   }
 
@@ -127,7 +127,7 @@ def weakly_meromorphic_modular_weight_k (k : ℤ) (Γ : subgroup SL(2,ℤ)) (F :
 
 instance mem_mer : has_mem Merℍ (submodule ℂ (ℍ' → ℂ)) := ⟨λ F V, F.map ∈ V⟩
 
---Space of meromorphic_modular_forms
+--Meromorphic modular form subtype
 
 def Merℍwm (k : ℤ) (Γ : subgroup SL(2,ℤ)) :=
 { F : Merℍ // weakly_meromorphic_modular_weight_k k Γ F}

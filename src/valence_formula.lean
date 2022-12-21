@@ -33,10 +33,10 @@ localized "notation (name := modular_group.fd) `𝒟` := modular_group.fd" in mo
 localized "notation (name := modular_group.fdo) `𝒟ᵒ` := modular_group.fdo" in modular
 
 
--- Valuation of ∞:
+-- Valuation at ∞:
 
 
---Definitions of valuations
+--Definitions of orders/valuations
 
 def val_i (F : Merℍ) := F.order (⟨(⟨0, 1⟩ : ℂ), by {simp only [zero_lt_one],} ⟩ : ℍ)
 
@@ -59,17 +59,6 @@ def S₁' (F: Merℍ) : set (frontier 𝒟) := {z | F.order ≠ 0}
 lemma S₁'_finite (F : Merℍ) : (S₁' F).finite := by sorry
 def S₁ (F : Merℍ) := set.finite.to_finset (S₁'_finite F)
 
-lemma S₀_is_discrete (F : Merℍ) : discrete_topology (S₀ F) :=
-begin
-
-sorry,
-end
-
-lemma S₁_is_discrete (F : Merℍ) : discrete_topology (S₁ F) :=
-begin
-
-sorry,
-end
 
 def S_set (F : Merℍ) : set 𝒟 := {z | F.order ≠ 0}
 
