@@ -451,3 +451,6 @@ Holℍ.order F.numerator z - Holℍ.order F.denominator z
 --next step would be to give the definition of a weakly modular form on the upper half plane.
 --from here i could start by trying to state the valence formula.
 
+
+-- Valuation at ∞:
+

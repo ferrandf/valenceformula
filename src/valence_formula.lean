@@ -2,17 +2,19 @@ import .mod_f
 import .hol_bdd
 import number_theory.modular
 import algebra.big_operators.basic
+import .q_expansion
+import analysis.complex.unit_disc.basic
 
 open complex
 
-open_locale big_operators topological_space manifold 
+open_locale big_operators classical
 
 
 noncomputable theory
 
-open modular_form modular_group
+open modular_form modular_group complex filter asymptotics
 
-open_locale upper_half_plane
+open_locale upper_half_plane real topological_space manifold filter
 
 local notation `ℍ'`:=(⟨upper_half_space , upper_half_plane_is_open⟩: open_subs)
 
@@ -31,10 +33,6 @@ local notation `SL(` n `, ` R `)`:= matrix.special_linear_group (fin n) R
 localized "notation (name := modular_group.fd) `𝒟` := modular_group.fd" in modular
 
 localized "notation (name := modular_group.fdo) `𝒟ᵒ` := modular_group.fdo" in modular
-
-
--- Valuation at ∞:
-
 
 --Definitions of orders/valuations
 
@@ -69,10 +67,31 @@ end
 
 instance coe_fd_ℍ_set : has_coe (set 𝒟) (set ℍ') := ⟨λ U, subtype.val '' U⟩
 
-/-lemma S_as_intersec (F : Merℍ) : (S_set F : set ℍ') = 𝒟 ∩ F.zeros :=
-begin
-sorry,
-end-/
+--Valuation at infty
+
+--Valuation at ∞ of a Holℍ function:
+
+localized "notation `𝔻` := complex.unit_disc" in unit_disc
+
+local notation `𝔻'` := ( ⟨unit_disc_sset, unit_disc_is_open⟩ : topological_space.opens ℂ)
+
+def G (f : Holℍ) : (𝔻' → ℂ) :=  λ q, ((f.val) (⟨Z 1 q, by {sorry,}⟩ : ℍ')) --use z_in_H from last lemma in q_expansion.lean
+
+def map_to_upper (x : ℝ) (N : ℕ) (hN : N > 0) : ℍ := ⟨(x + N * I),
+  by {
+    simp only [complex.add_im, complex.of_real_im, complex.I_im, zero_add, zero_lt_one],
+    simp only [mul_im, nat_cast_re, I_im, mul_one, I_re, mul_zero, add_zero, nat.cast_pos],
+    exact hN,
+    } ⟩
+
+def modular_form_an (n : ℕ) {N : ℕ} {hN : N > 0} {k : ℤ} {Γ : subgroup SL(2,ℤ)} (f : ℍ' → ℂ) (hf : modular_form_weight_k k Γ f)
+: ℂ := exp(2 * π * n * N) * ∫ (x : ℝ) in 0..1, ( exp (-2 * π * I * n *(map_to_upper x N hN))) * f (map_to_upper x N hN)
+
+
+def val_infty_Holℍ (f : Holℍ) {k : ℤ} {Γ : subgroup SL(2,ℤ)} (hf : modular_form_weight_k k Γ f) : ℕ := 
+Inf {n | modular_form_an n f.val hf ≠ 0}
+--aquí hauria de ser min dels n ∈ ℕ tal que modular_form_an ≠ 0
+
 
 def val_infty (F : Merℍ) : ℤ := sorry
 
