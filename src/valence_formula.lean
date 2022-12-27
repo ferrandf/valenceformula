@@ -77,23 +77,22 @@ local notation `𝔻'` := ( ⟨unit_disc_sset, unit_disc_is_open⟩ : topologica
 
 def G (f : Holℍ) : (𝔻' → ℂ) :=  λ q, ((f.val) (⟨Z 1 q, by {sorry,}⟩ : ℍ')) --use z_in_H from last lemma in q_expansion.lean
 
-def map_to_upper (x : ℝ) (N : ℕ) (hN : N > 0) : ℍ := ⟨(x + N * I),
+def map_to_upper (x : ℝ) : ℍ := ⟨(x + I),
   by {
     simp only [complex.add_im, complex.of_real_im, complex.I_im, zero_add, zero_lt_one],
-    simp only [mul_im, nat_cast_re, I_im, mul_one, I_re, mul_zero, add_zero, nat.cast_pos],
-    exact hN,
     } ⟩
 
-def modular_form_an (n : ℕ) {N : ℕ} {hN : N > 0} {k : ℤ} {Γ : subgroup SL(2,ℤ)} (f : ℍ' → ℂ) (hf : modular_form_weight_k k Γ f)
-: ℂ := exp(2 * π * n * N) * ∫ (x : ℝ) in 0..1, ( exp (-2 * π * I * n *(map_to_upper x N hN))) * f (map_to_upper x N hN)
+def modular_form_an (n : ℕ) {k : ℤ} {Γ : subgroup SL(2,ℤ)} (f : ℍ' → ℂ) (hf : modular_form_weight_k k Γ f)
+: ℂ := exp(2 * π * n) * ∫ (x : ℝ) in 0..1, ( exp (-2 * π * I * n *(map_to_upper x))) * f (map_to_upper x)
 
 
-def val_infty_Holℍ (f : Holℍ) {k : ℤ} {Γ : subgroup SL(2,ℤ)} (hf : modular_form_weight_k k Γ f) : ℕ := 
+def val_infty_Holℍ (f : Holℍ) (k : ℤ) (Γ : subgroup SL(2,ℤ)) (hf : modular_form_weight_k k Γ f) : ℕ := 
 Inf {n | modular_form_an n f.val hf ≠ 0}
 --aquí hauria de ser min dels n ∈ ℕ tal que modular_form_an ≠ 0
 
 
-def val_infty (F : Merℍ) : ℤ := sorry
+def val_infty (k1 k2 : ℤ) (k : ℤ) (Γ : subgroup SL(2,ℤ)) (F : Merℍwm k Γ) : ℤ := 
+val_infty_Holℍ F.val.numerator 
 
 theorem valence_formula (k : ℤ) (Γ : subgroup SL(2,ℤ)) (F : Merℍwm k Γ) :
   6 * val_infty F.val + 3 * val_i F.val + 2 * val_rho F.val + 6 * ∑ τ in (S₀ F.val), (F.val.order τ) + 12 * ∑ τ in (S₁ F.val), (F.val.order τ) = k/2 :=
