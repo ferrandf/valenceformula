@@ -119,6 +119,27 @@ def space_of_modular_forms_weight_k (k : ℤ) (Γ : subgroup SL(2,ℤ)) : submod
 def slash_mer_left (k : ℤ) (γ : SL(2,ℤ)) (f g : ℍ → ℂ) (z : ℍ) : ℂ :=
   f(γ • z) * g(z) * (upper_half_plane.denom γ z)^(-k)
 
+lemma power_of_diff (k1 k2 : ℤ) (a : ℂ) : a^(k1-k2) = a^k1 * a^(-k2) :=
+begin
+  sorry,
+end
+
+lemma sep_slash_mer_left (k1 k2 : ℕ) (k : ℤ) (hk : k = k1-k2) (γ : SL(2,ℤ)) (f g : ℍ → ℂ) (z : ℍ) : 
+  f(γ • z) * g(z) * (upper_half_plane.denom γ z)^(-k) = f(γ • z) * (upper_half_plane.denom γ z)^(-k1 : ℤ) * g(z) * (upper_half_plane.denom γ z)^(k2) :=
+  begin
+  rw hk,
+  simp only [neg_sub, pow_add],
+  have : (denom γ z)^(k2-k1) = (denom γ z)^k2 * (denom γ z)^(-k1 : ℤ),
+  {
+    simp,
+    sorry,
+  },
+  apply mul_comm (g z) ((upper_half_plane.denom γ z)^k2),
+  rw pow_add (denom γ z) (k2) (-k1),
+  ring_exp!,
+  sorry,
+  end
+
 def slash_mer_right (k : ℤ) (γ : SL(2,ℤ)) (f g : ℍ → ℂ) (z : ℍ) : ℂ :=
   f(z) * g(γ • z)
 
@@ -130,7 +151,30 @@ instance mem_mer : has_mem Merℍ (submodule ℂ (ℍ' → ℂ)) := ⟨λ F V, F
 --Meromorphic modular form subtype
 
 def Merℍwm (k : ℤ) (Γ : subgroup SL(2,ℤ)) :=
-{ F : Merℍ // weakly_meromorphic_modular_weight_k k Γ F}
+{F : Merℍ | weakly_meromorphic_modular_weight_k k Γ F}
+
+lemma Merℍwm_mem (k : ℤ) (Γ : subgroup SL(2,ℤ)) (F : Merℍ) :
+  F ∈ (Merℍwm k Γ) ↔  ∀ (γ : Γ), slash_mer_left k γ F.numerator.val F.denominator.val.val = slash_mer_right k γ F.numerator.val F.denominator.val.val := 
+  iff.rfl
+
+
+lemma Merℍ_ap (k : ℤ) (Γ : subgroup SL(2,ℤ)) (f : Holℍ) (g : non_zero_divisors Holℍ) : Merℍ :=
+begin
+exact Merℍ.mk f g,
+end
+
+def F_mk (f : Holℍ) (g : non_zero_divisors Holℍ) := Merℍ.mk f g
+
+lemma modular_forms_of_Merℍwm (k1 k2 : ℤ) (Γ : subgroup SL(2,ℤ))
+(f : Holℍ) (g : non_zero_divisors Holℍ) (hf : modular_form_weight_k k1 Γ f) (hg : modular_form_weight_k k2 Γ g)
+: F_mk f g ∈ Merℍwm (k1-k2) Γ :=
+begin
+rw Merℍwm_mem,
+intro γ,
+
+sorry,
+end
+
 
 
 /- def space_of_meromorphic_modular_forms_weight_k (k : ℤ) (Γ : subgroup SL(2,ℤ)) : submodule ℂ (ℍ' → ℂ) := {
