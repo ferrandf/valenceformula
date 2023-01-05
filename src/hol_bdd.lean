@@ -219,16 +219,16 @@ lemma hkey (z : ℂ) (U V V': set ℂ) (hU : U ∈ 𝓝 z)
 ∃ (w : ℂ), w ∈ U ∩ (V ∩ V') ∧ w ≠ z :=
 begin
 rw mem_nhds_iff at hU,
-rcases hU with ⟨hU',⟨hU'V,is_open_hU', hzU'⟩⟩,
-rw metric.is_open_iff at is_open_hU',
-specialize is_open_hU' z hzU',
-rcases is_open_hU' with ⟨ε, ⟨hε1, hε2⟩⟩,
+rcases hU with ⟨U',⟨hU'U,is_open_U', hzU'⟩⟩,
+rw metric.is_open_iff at is_open_U',
+specialize is_open_U' z hzU',
+rcases is_open_U' with ⟨ε, ⟨hε1, hε2⟩⟩,
 use z + ε/2,
 split,
 {
   apply mem_inter,
   {
-    apply hU'V,
+    apply hU'U,
     apply hε2,
     simp,
     rw abs_of_pos hε1,
@@ -236,12 +236,13 @@ split,
   },
   {
     apply (subset_inter hV hV'),
-    simp,
+    simp only [mem_compl_iff, mem_singleton_iff, add_right_eq_self, div_eq_zero_iff, of_real_eq_zero, bit0_eq_zero, one_ne_zero,
+    or_false],
     exact ne_of_gt hε1,
   }
 },
 {
-  simp,
+  simp only [ne.def, add_right_eq_self, div_eq_zero_iff, of_real_eq_zero, bit0_eq_zero, one_ne_zero, or_false],
   exact ne_of_gt hε1,
 }
 end
