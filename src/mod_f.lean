@@ -71,7 +71,7 @@ def weakly_modular_weight_k (k : ℤ) (Γ : subgroup SL(2,ℤ)) (f : ℍ' → �
   ∀ (γ : Γ),  (f ∣[k] (γ : GL(2, ℝ)⁺)) = f
 
 
-lemma zero_weakly_modular (k : ℤ) (Γ : subgroup SL(2,ℤ)) : weakly_modular_weight_k k Γ (0 : ℍ' → ℂ) :=
+lemma zero_weakly_modular (k : ℤ)  : weakly_modular_weight_k k Γ (0 : ℍ' → ℂ) :=
 begin
 intro γ,
 simp,
