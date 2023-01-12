@@ -230,7 +230,7 @@ split,
   {
     apply hU'U,
     apply hε2,
-    simp,
+    simp only [metric.mem_ball, dist_self_add_left, norm_eq_abs, map_div₀, abs_of_real, complex.abs_two],
     rw abs_of_pos hε1,
     linarith,
   },
