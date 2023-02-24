@@ -71,12 +71,14 @@ def weakly_modular_weight_k (k : ℤ) (Γ : subgroup SL(2,ℤ)) (f : ℍ' → �
   ∀ (γ : Γ),  (f ∣[k] (γ : GL(2, ℝ)⁺)) = f
 
 
-lemma zero_weakly_modular (k : ℤ)  : weakly_modular_weight_k k Γ (0 : ℍ' → ℂ) :=
+lemma zero_weakly_modular (k : ℤ) (Γ : subgroup SL(2,ℤ)) : weakly_modular_weight_k k Γ (0 : ℍ' → ℂ) :=
 begin
 intro γ,
 simp,
 sorry,
 end
+
+def one_periodicity (f : ℍ' → ℂ) := ∀ (z : ℍ'), extend_by_zero f (z + 1) = extend_by_zero f (z)
 
 def weakly_modular_submodule_weight_k (k : ℤ) (Γ : subgroup SL(2,ℤ)) : submodule ℂ (ℍ' → ℂ) := {
   carrier := weakly_modular_weight_k k Γ,
@@ -121,6 +123,7 @@ def slash_mer_left (k : ℤ) (γ : SL(2,ℤ)) (f g : ℍ → ℂ) (z : ℍ) : �
 
 lemma power_of_diff (k1 k2 : ℤ) (a : ℂ) : a^(k1-k2) = a^k1 * a^(-k2) :=
 begin
+  
   sorry,
 end
 
@@ -134,7 +137,7 @@ lemma sep_slash_mer_left (k1 k2 : ℕ) (k : ℤ) (hk : k = k1-k2) (γ : SL(2,ℤ
     simp,
     sorry,
   },
-  apply mul_comm (g z) ((upper_half_plane.denom γ z)^k2),
+  apply mul_comm (g z) ((upper_half_plane.denom ↑γ z)^k2),
   rw pow_add (denom γ z) (k2) (-k1),
   ring_exp!,
   sorry,
@@ -143,18 +146,18 @@ lemma sep_slash_mer_left (k1 k2 : ℕ) (k : ℤ) (hk : k = k1-k2) (γ : SL(2,ℤ
 def slash_mer_right (k : ℤ) (γ : SL(2,ℤ)) (f g : ℍ → ℂ) (z : ℍ) : ℂ :=
   f(z) * g(γ • z)
 
-def weakly_meromorphic_modular_weight_k (k : ℤ) (Γ : subgroup SL(2,ℤ)) (F : Merℍ) :=
-  ∀ (γ : Γ), slash_mer_left k γ F.numerator.val F.denominator.val.val = slash_mer_right k γ F.numerator.val F.denominator.val.val
+def weakly_meromorphic_modular_weight_k (k : ℤ) (F : Merℍ) :=
+  ∀ (γ : SL(2,ℤ)), slash_mer_left k γ F.numerator.val F.denominator.val.val = slash_mer_right k γ F.numerator.val F.denominator.val.val
 
 instance mem_mer : has_mem Merℍ (submodule ℂ (ℍ' → ℂ)) := ⟨λ F V, F.map ∈ V⟩
 
 --Meromorphic modular form subtype
 
-def Merℍwm (k : ℤ) (Γ : subgroup SL(2,ℤ)) :=
-{F : Merℍ | weakly_meromorphic_modular_weight_k k Γ F}
+def Merℍwm (k : ℤ) :=
+{F : Merℍ | weakly_meromorphic_modular_weight_k k F}
 
-lemma Merℍwm_mem (k : ℤ) (Γ : subgroup SL(2,ℤ)) (F : Merℍ) :
-  F ∈ (Merℍwm k Γ) ↔  ∀ (γ : Γ), slash_mer_left k γ F.numerator.val F.denominator.val.val = slash_mer_right k γ F.numerator.val F.denominator.val.val := 
+lemma Merℍwm_mem (k : ℤ) (F : Merℍ) :
+  F ∈ (Merℍwm k) ↔  ∀ (γ : SL(2,ℤ)), slash_mer_left k γ F.numerator.val F.denominator.val.val = slash_mer_right k γ F.numerator.val F.denominator.val.val := 
   iff.rfl
 
 

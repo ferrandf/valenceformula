@@ -4,6 +4,7 @@ import number_theory.modular
 import algebra.big_operators.basic
 import .q_expansion
 import analysis.complex.unit_disc.basic
+import number_theory.modular
 --import data.nat.lattice
 
 
@@ -76,16 +77,32 @@ instance coe_fd_ℍ_set : has_coe (set 𝒟) (set ℍ') := ⟨λ U, subtype.val 
 localized "notation `𝔻` := complex.unit_disc" in unit_disc
 
 local notation `𝔻'` := ( ⟨unit_disc_sset, unit_disc_is_open⟩ : topological_space.opens ℂ)
+instance : has_zero 𝔻' := 
+begin
+  simp only [coe_sort_coe_base, subtype.coe_mk],
+  have : (0 : ℂ).abs < 1,
+  {
+    simp only [absolute_value.map_zero, zero_lt_one],
+  },
+  rw unit_disc_sset,
+  use 0,
+  exact this,
+end
 
-def G (f : Holℍ) : (𝔻' → ℂ) :=  λ q, ((f.val) (⟨Z 1 q, by {sorry,}⟩ : ℍ')) --use z_in_H from last lemma in q_expansion.lean
 
-def map_to_upper (x : ℝ) : ℍ := ⟨(x + I),
+
+def G (f : ℍ' → ℂ) (hf : one_periodicity f): (𝔻' → ℂ) :=  λ q, dite (q = 0) 0 (f (⟨Z 1 q, by {exact z_in_H q (¬q = 0), sorry,}⟩ : ℍ)) --use z_in_H from last lemma in q_expansion.lean
+
+
+
+def map_to_upper (x : ℝ) (y : ℝ) (hy : y>0) : ℍ := ⟨(x + y*I),
   by {
-    simp only [complex.add_im, complex.of_real_im, complex.I_im, zero_add, zero_lt_one],
+    simp only [complex.add_im, complex.of_real_im, zero_add, complex.of_real_mul_im,complex.I_im, mul_one],
+    exact hy,
     } ⟩
 
-def modular_form_an (n : ℕ) {k : ℤ} {Γ : subgroup SL(2,ℤ)} (f : ℍ' → ℂ) (hf : modular_form_weight_k k Γ f)
-: ℂ := exp(2 * π * n) * ∫ (x : ℝ) in 0..1, ( exp (-2 * π * I * n *(map_to_upper x))) * f (map_to_upper x)
+def q_expansion_an (n : ℕ) (y : ℝ) (hy : y>0) (f : Holℍ) (hf : one_periodicity f)
+: ℂ := exp(2 * π * n * y) * ∫ (x : ℝ) in 0..1, ( exp (-2 * π * I * n *(map_to_upper x y hy))) * f.val (map_to_upper x y hy)
 
 variables {s : set ℕ}
 def vtst (hs : s.nonempty) : ℕ := Inf s
@@ -94,12 +111,14 @@ begin
 exact Inf_mem hs,
 end
 
-def val_infty_Holℍ (f : Holℍ) (k : ℤ) (Γ : subgroup SL(2,ℤ)) (hf : modular_form_weight_k k Γ f) : ℕ := 
-Inf {n | modular_form_an n f.val hf ≠ 0}
+
+
+def val_infty_Holℍ (f : Holℍ) (hf : one_periodicity f) : ℕ := 
+Inf {n | q_expansion_an n Rlim f hf ≠ 0}
 --aquí hauria de ser min dels n ∈ ℕ tal que modular_form_an ≠ 0
 
-example  (f : Holℍ) (k : ℤ) (Γ : subgroup SL(2,ℤ)) (hf : modular_form_weight_k k Γ f)
-: modular_form_an (val_infty_Holℍ f k Γ hf) f.val hf ≠ 0 :=
+example  (f : Holℍ) (k : ℤ) (Γ : subgroup SL(2,ℤ)) (hf : one_periodicity f)
+: q_expansion_an (val_infty_Holℍ f k Γ hf) 1 k f.val hf ≠ 0 :=
 begin
   change val_infty_Holℍ f k Γ hf ∈ {n | modular_form_an n f.val hf ≠ 0},
   apply nat.Inf_mem _,
