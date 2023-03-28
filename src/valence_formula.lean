@@ -91,7 +91,7 @@ end
 
 
 
-def G (f : ℍ' → ℂ) (hf : one_periodicity f): (𝔻' → ℂ) :=  λ q, dite (q = 0) 0 (f (⟨Z 1 q, by {exact z_in_H q (¬q = 0), sorry,}⟩ : ℍ)) --use z_in_H from last lemma in q_expansion.lean
+def G (f : ℍ' → ℂ) (hf : one_periodicity f): (𝔻' → ℂ) :=  λ q, ite (q = 0) 0 (f (⟨Z 1 q, by {exact z_in_H q (¬q = 0), sorry,}⟩ : ℍ)) --use z_in_H from last lemma in q_expansion.lean
 
 
 
@@ -113,24 +113,24 @@ end
 
 
 
-def val_infty_Holℍ (f : Holℍ) (hf : one_periodicity f) : ℕ := 
-Inf {n | q_expansion_an n Rlim f hf ≠ 0}
+def val_infty_Holℍ (Rlim : ℝ) (hR : Rlim > 0) (f : Holℍ) (hf : one_periodicity f) : ℕ := 
+Inf {n | q_expansion_an n Rlim hR f hf ≠ 0}
 --aquí hauria de ser min dels n ∈ ℕ tal que modular_form_an ≠ 0
 
-example  (f : Holℍ) (k : ℤ) (Γ : subgroup SL(2,ℤ)) (hf : one_periodicity f)
-: q_expansion_an (val_infty_Holℍ f k Γ hf) 1 k f.val hf ≠ 0 :=
+example  (f : Holℍ) (k : ℤ) (hf : one_periodicity f)
+: q_expansion_an (val_infty_Holℍ f hf) 1 k f.val hf ≠ 0 :=
 begin
-  change val_infty_Holℍ f k Γ hf ∈ {n | modular_form_an n f.val hf ≠ 0},
+  change val_infty_Holℍ f k hf ∈ {n | modular_form_an n f.val hf ≠ 0},
   apply nat.Inf_mem _,
   sorry
 end
 
 
-def val_infty (k : ℤ) (Γ : subgroup SL(2,ℤ)) (F : Merℍwm k Γ) : ℤ := sorry /-(k1 k2 : ℤ) (k : ℤ) (Γ : subgroup SL(2,ℤ)) (F : Merℍwm k Γ) : ℤ := -/
+def val_infty (k : ℤ) (F : Merℍwm k) : ℤ := sorry /-(k1 k2 : ℤ) (k : ℤ) (Γ : subgroup SL(2,ℤ)) (F : Merℍwm k Γ) : ℤ := -/
 
 
-theorem valence_formula (k : ℤ) (Γ : subgroup SL(2,ℤ)) (F : Merℍwm k Γ) :
-  6 * val_infty F.val + 3 * val_i F.val + 2 * val_rho F.val + 6 * ∑ τ in (S₀ F.val), (F.val.order τ) + 12 * ∑ τ in (S₁ F.val), (F.val.order τ) = k/2 :=
+theorem valence_formula (k : ℤ) (F : Merℍwm k) :
+  6 * val_infty k F.val + 3 * val_i F.val + 2 * val_rho F.val + 6 * ∑ τ in (S₀ F.val), (F.val.order τ) + 12 * ∑ τ in (S₁ F.val), (F.val.order τ) = k/2 :=
 begin
 
 sorry,

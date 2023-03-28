@@ -67,11 +67,11 @@ variables (Γ : subgroup SL(2,ℤ)) (C : GL(2, ℝ)⁺) (k: ℤ) (f : (ℍ → �
 
 localized "notation  f  ` ∣[`:100 k `]`:0 γ :100 := slash k γ f" in modular_form
 
-def weakly_modular_weight_k (k : ℤ) (Γ : subgroup SL(2,ℤ)) (f : ℍ' → ℂ) :=
-  ∀ (γ : Γ),  (f ∣[k] (γ : GL(2, ℝ)⁺)) = f
+--Definition of modular forms:
+def weakly_modular_weight_k (k : ℤ) (f : ℍ' → ℂ) :=
+    ∀ (γ : SL(2,ℤ)),  (f ∣[k] (γ : GL(2, ℝ)⁺)) = f
 
-
-lemma zero_weakly_modular (k : ℤ) (Γ : subgroup SL(2,ℤ)) : weakly_modular_weight_k k Γ (0 : ℍ' → ℂ) :=
+lemma zero_weakly_modular (k : ℤ) : weakly_modular_weight_k k (0 : ℍ' → ℂ) :=
 begin
 intro γ,
 simp,
@@ -80,9 +80,62 @@ end
 
 def one_periodicity (f : ℍ' → ℂ) := ∀ (z : ℍ'), extend_by_zero f (z + 1) = extend_by_zero f (z)
 
-def weakly_modular_submodule_weight_k (k : ℤ) (Γ : subgroup SL(2,ℤ)) : submodule ℂ (ℍ' → ℂ) := {
-  carrier := weakly_modular_weight_k k Γ,
-  zero_mem' := by {exact zero_weakly_modular k Γ},
+def weakly_modular_submodule_weight_k (k : ℤ) : submodule ℂ (ℍ' → ℂ) := {
+  carrier := weakly_modular_weight_k k,
+  zero_mem' := by {exact zero_weakly_modular k},
+  add_mem' := by {
+    intros f g hf hg,
+    intro γ,
+    have hff:= hf γ,
+    have hgg:= hg γ,
+    rw slash_add k γ f g,
+    rw [hff, hgg],
+  },
+  smul_mem' := by {
+    intros c f hf,
+    intro γ,
+    have hff:= hf γ,
+    have : (c • f)  ∣[k] γ = c • (f  ∣[k] γ ),
+    by {apply smul_slash},
+    rw hff at this,
+    apply this,
+  },
+}
+
+
+class modular_form_weight_k (k : ℤ) (f : ℍ' → ℂ) : Prop :=
+  (hol : f ∈ Holℍ)
+  (weak : weakly_modular_weight_k k f)
+
+
+def space_of_modular_forms_weight_k (k : ℤ) : submodule ℂ (ℍ' → ℂ) := { 
+  carrier := modular_form_weight_k k,
+  add_mem' := λ f g hf hg, ⟨Holℍ.add_mem' hf.hol hg.hol, (weakly_modular_submodule_weight_k k).add_mem' hf.weak hg.weak⟩,
+  zero_mem' := ⟨Holℍ.zero_mem', zero_weakly_modular k⟩,
+  smul_mem' := λ c f hf, ⟨⟨smul_hol _ _ hf.hol.diff, bounded_at_im_infty.smul _ hf.hol.bdd_at_infty⟩,
+    (weakly_modular_submodule_weight_k k).smul_mem' c hf.weak⟩,
+  }
+
+
+
+
+-- Definition of modular forms for congruence subgroups:
+
+def weakly_modular_weight_k_subgroup (k : ℤ) (Γ : subgroup SL(2,ℤ)) (f : ℍ' → ℂ) :=
+  ∀ (γ : Γ),  (f ∣[k] (γ : GL(2, ℝ)⁺)) = f
+
+
+lemma zero_weakly_modular_subgroup (k : ℤ) (Γ : subgroup SL(2,ℤ)) : weakly_modular_weight_k_subgroup k Γ (0 : ℍ' → ℂ) :=
+begin
+intro γ,
+simp,
+sorry,
+end
+
+
+def weakly_modular_submodule_weight_k_subgroup (k : ℤ) (Γ : subgroup SL(2,ℤ)) : submodule ℂ (ℍ' → ℂ) := {
+  carrier := weakly_modular_weight_k_subgroup k Γ,
+  zero_mem' := by {exact zero_weakly_modular_subgroup k Γ},
   add_mem' := by {
     intros f g hf hg,
     intro γ,
@@ -104,20 +157,20 @@ def weakly_modular_submodule_weight_k (k : ℤ) (Γ : subgroup SL(2,ℤ)) : subm
 
 --instance : has_mem (ℍ' → ℂ) (submodule ℂ (ℍ' → ℂ)) := ⟨λ f V, f ∈ V⟩
 
---Space of modular forms
-class modular_form_weight_k (k : ℤ) (Γ : subgroup SL(2,ℤ)) (f : ℍ' → ℂ) : Prop :=
+--Space of modular forms for congruence subgroups:
+class modular_form_weight_k_subgroup (k : ℤ) (Γ : subgroup SL(2,ℤ)) (f : ℍ' → ℂ) : Prop :=
   (hol : f ∈ Holℍ)
-  (weak : weakly_modular_weight_k k Γ f)
+  (weak : weakly_modular_weight_k_subgroup k Γ f)
 
-def space_of_modular_forms_weight_k (k : ℤ) (Γ : subgroup SL(2,ℤ)) : submodule ℂ (ℍ' → ℂ) := { 
-  carrier := modular_form_weight_k k Γ,
-  add_mem' := λ f g hf hg, ⟨Holℍ.add_mem' hf.hol hg.hol, (weakly_modular_submodule_weight_k k Γ).add_mem' hf.weak hg.weak⟩,
-  zero_mem' := ⟨Holℍ.zero_mem', zero_weakly_modular k Γ⟩,
+def space_of_modular_forms_weight_k_subgroup (k : ℤ) (Γ : subgroup SL(2,ℤ)) : submodule ℂ (ℍ' → ℂ) := { 
+  carrier := modular_form_weight_k_subgroup k Γ,
+  add_mem' := λ f g hf hg, ⟨Holℍ.add_mem' hf.hol hg.hol, (weakly_modular_submodule_weight_k_subgroup k Γ).add_mem' hf.weak hg.weak⟩,
+  zero_mem' := ⟨Holℍ.zero_mem', zero_weakly_modular_subgroup k Γ⟩,
   smul_mem' := λ c f hf, ⟨⟨smul_hol _ _ hf.hol.diff, bounded_at_im_infty.smul _ hf.hol.bdd_at_infty⟩,
-    (weakly_modular_submodule_weight_k k Γ).smul_mem' c hf.weak⟩,
+    (weakly_modular_submodule_weight_k_subgroup k Γ).smul_mem' c hf.weak⟩,
   }
 
--- For meromorphic functions
+-- Definition of meromorphic modular forms:
 def slash_mer_left (k : ℤ) (γ : SL(2,ℤ)) (f g : ℍ → ℂ) (z : ℍ) : ℂ :=
   f(γ • z) * g(z) * (upper_half_plane.denom γ z)^(-k)
 
@@ -132,14 +185,13 @@ lemma sep_slash_mer_left (k1 k2 : ℕ) (k : ℤ) (hk : k = k1-k2) (γ : SL(2,ℤ
   begin
   rw hk,
   simp only [neg_sub, pow_add],
-  have : (denom γ z)^(k2-k1) = (denom γ z)^k2 * (denom γ z)^(-k1 : ℤ),
+  have : (denom γ z)^((k2 : ℤ)-(k1:ℤ)) = (denom γ z)^(k2:ℤ) * (denom γ z)^(-k1 : ℤ),
   {
     simp,
     sorry,
   },
-  apply mul_comm (g z) ((upper_half_plane.denom ↑γ z)^k2),
-  rw pow_add (denom γ z) (k2) (-k1),
-  ring_exp!,
+  rw this,
+  simp only [of_real_int_cast, zpow_coe_nat, zpow_neg],
   sorry,
   end
 
@@ -166,11 +218,9 @@ begin
 exact Merℍ.mk f g,
 end
 
-def F_mk (f : Holℍ) (g : non_zero_divisors Holℍ) := Merℍ.mk f g
-
-lemma modular_forms_of_Merℍwm (k1 k2 : ℤ) (Γ : subgroup SL(2,ℤ))
-(f : Holℍ) (g : non_zero_divisors Holℍ) (hf : modular_form_weight_k k1 Γ f) (hg : modular_form_weight_k k2 Γ g)
-: F_mk f g ∈ Merℍwm (k1-k2) Γ :=
+lemma modular_forms_of_Merℍwm (k1 k2 : ℤ) (hk : k = k1-k2)
+(f : Holℍ) (g : non_zero_divisors Holℍ) (hf : modular_form_weight_k k1 f) (hg : modular_form_weight_k k2 g)
+: Merℍ.mk f g ∈ Merℍwm (k) :=
 begin
 rw Merℍwm_mem,
 intro γ,
