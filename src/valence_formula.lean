@@ -91,10 +91,6 @@ end
 
 
 
-def G (f : ℍ' → ℂ) (hf : one_periodicity f): (𝔻' → ℂ) :=  λ q, dite (q = 0) 0 (f (⟨Z 1 q, by {exact z_in_H q (¬q = 0), sorry,}⟩ : ℍ)) --use z_in_H from last lemma in q_expansion.lean
-
-
-
 def map_to_upper (x : ℝ) (y : ℝ) (hy : y>0) : ℍ := ⟨(x + y*I),
   by {
     simp only [complex.add_im, complex.of_real_im, zero_add, complex.of_real_mul_im,complex.I_im, mul_one],
@@ -113,8 +109,8 @@ end
 
 
 
-def val_infty_Holℍ (f : Holℍ) (hf : one_periodicity f) : ℕ := 
-Inf {n | q_expansion_an n Rlim f hf ≠ 0}
+def val_infty_Holℍ (f : Holℍ) (hf : one_periodicity f) (y0 : ℝ) (hy0 : y0 > 0) : ℕ := 
+Inf {n | (q_expansion_an n y0 hy0 f hf) ≠ 0}
 --aquí hauria de ser min dels n ∈ ℕ tal que modular_form_an ≠ 0
 
 example  (f : Holℍ) (k : ℤ) (Γ : subgroup SL(2,ℤ)) (hf : one_periodicity f)
