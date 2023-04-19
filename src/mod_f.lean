@@ -73,8 +73,6 @@ def weakly_modular_weight_k (k : ℤ) (f : ℍ' → ℂ) :=
 
 lemma zero_weakly_modular (k : ℤ) : weakly_modular_weight_k k (0 : ℍ' → ℂ) :=
 begin
-intro γ,
-simp,
 sorry,
 end
 
