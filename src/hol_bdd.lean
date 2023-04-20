@@ -158,20 +158,25 @@ lemma hol_bdd.eventually_eq_zero_everywhere (f : Holℍ)
   (x : ℍ') (hF : ∀ᶠ z in 𝓝 x, (extend_by_zero f.val) z = 0):
   (extend_by_zero f.val) = (0 : ℂ → ℂ) :=
 begin
-have hf : analytic_on ℂ (extend_by_zero f.val) ℍ',
+have hf := analytic_on_of_holomorphic f,
+have tf := analytic_on.eq_on_zero_of_preconnected_of_eventually_eq_zero hf preconn_ℍ' x.prop hF,
+simp at tf ⊢,
+rw extend_by_zero,
+apply funext, intros y,
+by_cases hy : y ∈ upper_half_space,
 {
-  --exact analytic_on_of_holomorphic f,
-  sorry,
+  simp [hy],
+  intro h,
+  specialize tf hy,
+  rw extend_by_zero_eq_of_mem _ _ h at tf,
+  exact tf,
 },
-have tf : ∀ ⦃y⦄, y ∈ upper_half_space → (extend_by_zero f.val) y = (0 : ℂ → ℂ) y,
 {
-  exact analytic_on.eq_on_zero_of_preconnected_of_eventually_eq_zero hf preconn_ℍ' x.prop hF,
-},
+  simp [hy],
+  intro h,
+  contradiction,
+}
 
-
-simp at tf,
-simp,
-sorry,
 end
 
 
@@ -427,14 +432,6 @@ sorry
 end
  -/
 
-lemma discrete_iff (S : set ℂ) : (discrete_topology S) ↔ ∀ s ∈ S, ∃ (ε : ℝ), 0 < ε ∧ metric.ball s ε ∩ S = {s} :=
-begin
-  split,
-  intros hS s hs,
-  rw discrete_topology_iff_nhds at hS,
-  sorry,
-  sorry,
-end
 
 --Given F = f/g a meromorphic function and z ∈ ℍ, we can compute the order of F at z as
 --the difference of the order of f and the order of g.

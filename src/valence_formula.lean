@@ -4,7 +4,6 @@ import number_theory.modular
 import algebra.big_operators.basic
 import .q_expansion
 import analysis.complex.unit_disc.basic
-import number_theory.modular
 --import data.nat.lattice
 
 
@@ -96,8 +95,8 @@ def map_to_upper (x : ℝ) (y : ℝ) (hy : y>0) : ℍ := ⟨(x + y*I),
     exact hy,
     } ⟩
 
-def q_expansion_an (n : ℕ) (y : ℝ) (hy : y>0) (f : Holℍ) (hf : one_periodicity f)
-: ℂ := exp(2 * π * n * y) * ∫ (x : ℝ) in 0..1, ( exp (-2 * π * I * n *(map_to_upper x y hy))) * f.val (map_to_upper x y hy)
+def q_expansion_an (n : ℤ) (y : ℝ) (hy : y>0) (f : Merℍ) (hf : one_periodicity f.map)
+: ℂ := exp(2 * π * n * y) * ∫ (x : ℝ) in 0..1, ( exp (-2 * π * I * n *(map_to_upper x y hy))) * f.map (map_to_upper x y hy)
 
 variables {s : set ℕ}
 def vtst (hs : s.nonempty) : ℕ := Inf s
@@ -107,40 +106,28 @@ exact Inf_mem hs,
 end
 
 
-def val_infty_Holℍ (f : Holℍ) (hf : one_periodicity f) (y0 : ℝ) (hy0 : y0 > 0) : ℕ := 
-Inf {n | (q_expansion_an n y0 hy0 f hf) ≠ 0}
+def val_infty_Merℍ (f : Merℍ) (hf : one_periodicity f.map) (y0 : ℝ) (hy0 : y0 > 0) : ℤ := sorry
+--Inf {n : ℤ | (q_expansion_an n y0 hy0 f hf) ≠ 0}
 
 /-aquí hauria de ser min dels n ∈ ℕ tal que modular_form_an ≠ 0
 
 example  (f : Holℍ) (k : ℤ) (hf : one_periodicity f)
 : q_expansion_an (val_infty_Holℍ f hf 1 zero_lt_one) 1 zero_lt_one f hf ≠ 0 :=
-begin
+  begin
   change val_infty_Holℍ f k hf ∈ {n | modular_form_an n f.val hf ≠ 0},
   apply nat.Inf_mem _,
   sorry
 end
 -/
 
-lemma Merℍ.numerator_is_oneperiodic (F : Merℍ) : one_periodicity F.numerator.val :=
+lemma Merℍ.is_oneperiodic (k : ℤ) (F : Merℍwm k) : one_periodicity F.val.map :=
 begin
 sorry,
 end
 
-def val_infty (k : ℤ) (F : Merℍwm k) : ℤ :=  val_infty_Holℍ F.val.numerator Merℍ.numerator_is_oneperiodic F.val
+--def val_infty (k : ℤ) (F : Merℍwm k) : ℤ :=  val_infty_Merℍ F.val.numerator Merℍ.numerator_is_oneperiodic F.val
 
 
 theorem valence_formula (k : ℤ) (F : Merℍwm k) :
-  6 * val_infty k F.val + 3 * val_i F.val + 2 * val_rho F.val + 6 * ∑ τ in (S₀ F.val), (F.val.order τ) + 12 * ∑ τ in (S₁ F.val), (F.val.order τ) = k/2 :=
-begin
-
-sorry,
-end
-
-def val_prova_a0 (f : Holℍ) : ℕ := f upper_half_plane.at_im_infty
-
-lemma consq1 (k : ℤ) (hk : k < 12) (f g : Holℍ) (hf : modular_form_weight_k k f.val) (hg : modular_form_weight_k k g.val) :
-∃ μ : ℂ, f = Holℍ.has_smul.smul μ g := 
-begin
-
-sorry,
-end
+  6 * (val_infty_Merℍ F.val (Merℍ.is_oneperiodic k F) 1 one_pos) + 3 * (val_i F.val) + 2 * (val_rho F.val)
+  + 6 * ∑ τ in (S₀ F.val), (F.val.order τ) + 12 * ∑ τ in (S₁ F.val), (F.val.order τ) = k/2 := by sorry

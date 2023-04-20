@@ -174,7 +174,6 @@ def slash_mer_left (k : ℤ) (γ : SL(2,ℤ)) (f g : ℍ → ℂ) (z : ℍ) : �
 
 lemma power_of_diff (k1 k2 : ℤ) (a : ℂ) : a^(k1-k2) = a^k1 * a^(-k2) :=
 begin
-  
   sorry,
 end
 
@@ -206,15 +205,6 @@ instance mem_mer : has_mem Merℍ (submodule ℂ (ℍ' → ℂ)) := ⟨λ F V, F
 def Merℍwm (k : ℤ) :=
 {F : Merℍ | weakly_meromorphic_modular_weight_k k F}
 
-lemma Merℍwm_mem (k : ℤ) (F : Merℍ) :
-  F ∈ (Merℍwm k) ↔  ∀ (γ : SL(2,ℤ)), slash_mer_left k γ F.numerator.val F.denominator.val.val = slash_mer_right k γ F.numerator.val F.denominator.val.val := 
-  iff.rfl
-
-
-lemma Merℍ_ap (k : ℤ) (Γ : subgroup SL(2,ℤ)) (f : Holℍ) (g : non_zero_divisors Holℍ) : Merℍ :=
-begin
-exact Merℍ.mk f g,
-end
 
 lemma modular_forms_of_Merℍwm (k1 k2 : ℤ) (hk : k = k1-k2)
 (f : Holℍ) (g : non_zero_divisors Holℍ) (hf : modular_form_weight_k k1 f) (hg : modular_form_weight_k k2 g)
