@@ -38,15 +38,16 @@ by ext z; by_cases h : z ∈ s; simp [extend_by_zero, h]
 lemma extend_by_zero_f_eq_zero [has_zero β] (f : s → β)
 (h : extend_by_zero f = 0) : f = 0 :=
 begin
-
+ext,
 sorry,
 end
 
 lemma extend_by_zero_f_neq_zero [has_zero β] (f : s → β)
 (h : extend_by_zero f ≠ 0) : f ≠ 0 :=
 begin
-
-sorry,
+contrapose! h,
+rw h,
+exact extend_by_zero_zero,
 end
 
 lemma extend_by_zero_add [add_group β] (f g : s → β) :

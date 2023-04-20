@@ -107,7 +107,6 @@ exact Inf_mem hs,
 end
 
 
-
 def val_infty_Holℍ (f : Holℍ) (hf : one_periodicity f) (y0 : ℝ) (hy0 : y0 > 0) : ℕ := 
 Inf {n | (q_expansion_an n y0 hy0 f hf) ≠ 0}
 
@@ -127,11 +126,20 @@ begin
 sorry,
 end
 
-def val_infty (k : ℤ) (F : Merℍwm k) : ℤ :=  val_infty_Holℍ F.val.numerator Merℍ.numerator_is_oneperiodic F.val.numerator
+def val_infty (k : ℤ) (F : Merℍwm k) : ℤ :=  val_infty_Holℍ F.val.numerator Merℍ.numerator_is_oneperiodic F.val
 
 
 theorem valence_formula (k : ℤ) (F : Merℍwm k) :
   6 * val_infty k F.val + 3 * val_i F.val + 2 * val_rho F.val + 6 * ∑ τ in (S₀ F.val), (F.val.order τ) + 12 * ∑ τ in (S₁ F.val), (F.val.order τ) = k/2 :=
+begin
+
+sorry,
+end
+
+def val_prova_a0 (f : Holℍ) : ℕ := f upper_half_plane.at_im_infty
+
+lemma consq1 (k : ℤ) (hk : k < 12) (f g : Holℍ) (hf : modular_form_weight_k k f.val) (hg : modular_form_weight_k k g.val) :
+∃ μ : ℂ, f = Holℍ.has_smul.smul μ g := 
 begin
 
 sorry,
