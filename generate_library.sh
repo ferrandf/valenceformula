@@ -8,7 +8,7 @@ sed -i 's/name.*/name = "combined_lib"/g' leanpkg.toml
 sed -i '/path/d' leanpkg.toml
 
 # Get last revision of code:
-LAST_COMMIT=$(git ls-remote https://github.com/mmasdeu/topologygame.git HEAD | cut -f1)
+LAST_COMMIT=$(git ls-remote https://github.com/ferrandf/valenceformula.git HEAD | cut -f1)
 echo "valenceformula = {git = \"https://github.com/ferrandf/valenceformula\", rev = \"$LAST_COMMIT\"}" >> leanpkg.toml
 
 # Generate a zip in dist/library.zip
