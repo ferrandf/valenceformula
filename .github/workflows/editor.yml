@@ -25,7 +25,7 @@ jobs:
           repo: ${{ github.repository }}
           access-token: ${{ secrets.GITHUB_TOKEN }}
       - name: update version branches
-        uses: leanprover-contrib/update-versions-action@master
+        uses: leanprover-contrib/update-versions-action@main
         
       - name: Setup Python
         uses: actions/setup-python@v2
