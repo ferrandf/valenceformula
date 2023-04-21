@@ -19,7 +19,14 @@ jobs:
         uses: actions/checkout@v2
         with:
           ref: ${{ env.branch }}
-
+      - name: upgrade Lean and dependencies
+        uses: leanprover-contrib/lean-upgrade-action@master
+        with:
+          repo: ${{ github.repository }}
+          access-token: ${{ secrets.GITHUB_TOKEN }}
+      - name: update version branches
+        uses: leanprover-contrib/update-versions-action@master
+        
       - name: Setup Python
         uses: actions/setup-python@v2
         with:
