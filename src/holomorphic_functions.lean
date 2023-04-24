@@ -15,6 +15,8 @@ universes u v
 open_locale classical topological_space big_operators filter
 open filter complex asymptotics
 
+-- Extend by zero definitoin and lemmas:
+
 section
 variables {α : Type*} {β : Type*} {s : set α}
 
@@ -35,12 +37,6 @@ lemma extend_by_zero_zero' [has_zero β] :
 extend_by_zero (0 : s → β) = 0 :=
 by ext z; by_cases h : z ∈ s; simp [extend_by_zero, h]
 
-lemma extend_by_zero_f_eq_zero [has_zero β] (f : s → β)
-(h : extend_by_zero f = 0) : f = 0 :=
-begin
-ext,
-sorry,
-end
 
 lemma extend_by_zero_f_neq_zero [has_zero β] (f : s → β)
 (h : extend_by_zero f ≠ 0) : f ≠ 0 :=
@@ -48,6 +44,13 @@ begin
 contrapose! h,
 rw h,
 exact extend_by_zero_zero,
+end
+
+lemma extend_by_zero_f_eq_zero [has_zero β] (f : s → β)
+(h : extend_by_zero f = 0) : f = 0 :=
+begin
+
+sorry,
 end
 
 lemma extend_by_zero_add [add_group β] (f g : s → β) :
@@ -115,7 +118,12 @@ begin
   apply has_deriv_within_at.differentiable_within_at  h2,
 end
 
+-- The last lemma enables us to work with either definition. We now know f being holomorphic on D
+-- is the same as the extension by zero of f being differentiable on D.
+
 variable {D : open_subs}
+
+-- Extension by zero lemmas:
 
 lemma ext_by_zero_eq (D: open_subs) (c : ℂ):
 ∀ (y : ℂ), (y ∈ (D.1 : set ℂ)) → extend_by_zero (λ z : D.1, (c : ℂ)) y = c :=
@@ -147,6 +155,8 @@ begin
   rw this,
   simp,
 end
+
+-- The constant functions are holomorphic:
 
 lemma const_hol  (c : ℂ) : is_holomorphic_on (λ z : D.1, (c : ℂ)) :=
 begin
@@ -181,8 +191,10 @@ end
 lemma one_hol (D: open_subs) : is_holomorphic_on (λ z : D.1, (1 : ℂ)) :=
 begin
 apply const_hol (1: ℂ),
-
 end
+
+-- Adding two holomorphic functions gives us another holomoprhic function:
+
 lemma add_hol (f g : D.1 → ℂ) (f_hol : is_holomorphic_on f) (g_hol : is_holomorphic_on g) :
   is_holomorphic_on (f + g) :=
 begin
@@ -195,6 +207,8 @@ begin
   exact this,
 end
 
+-- Same for multiplication:
+
 lemma mul_hol (f g : D.1 → ℂ) (f_hol : is_holomorphic_on f) (g_hol : is_holomorphic_on g) :
   is_holomorphic_on (f * g) :=
 begin
@@ -206,6 +220,8 @@ begin
   have:=has_deriv_within_at.mul Hf Hg,
   exact this,
 end
+
+-- And for -f:
 
 lemma neg_hol (f : D.1 → ℂ) (f_hol : is_holomorphic_on f) : is_holomorphic_on (-f) :=
 begin
@@ -227,6 +243,8 @@ def hol_ring (D: open_subs) : subring (D.1 → ℂ) :=
   one_mem'  := one_hol D
 }
 
+-- Given f a holomorphic function and c ∈ ℂ, c ⬝ f is also a holomoprhic function:
+
 lemma smul_hol (c : ℂ) (f : D.1 → ℂ) (f_hol : is_holomorphic_on f) : is_holomorphic_on (c • f) :=
 begin
   intro z₀,
@@ -235,15 +253,16 @@ begin
   rw extend_by_zero_smul,
   have h2:= has_deriv_within_at.const_smul c Hf,
   exact h2,
-
 end
+
+
 
 def hol_submodule (D: open_subs) : submodule (ℂ)  (D.1 → ℂ) :=
 { carrier := {f : D.1 → ℂ | is_holomorphic_on f},
   zero_mem' := zero_hol D,
   add_mem' := add_hol,
   smul_mem' := smul_hol}
-
+/-
 lemma aux (s t d : set ℂ) (h :  s ⊆ t) : s ∩ d ⊆ t :=
 begin
   intros x hx,
@@ -322,3 +341,5 @@ begin
   rw hFb,
   apply ha b hb x hx,
 end
+
+-/

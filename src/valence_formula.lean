@@ -1,17 +1,37 @@
-import .mod_f
-import .hol_bdd
 import number_theory.modular
 import algebra.big_operators.basic
-import .q_expansion
 import analysis.complex.unit_disc.basic
---import data.nat.lattice
+--import .q_expansion
+import .mod_f
 
+/-
+# Valence formula statement:
+
+- We add a the bounded at im_infty property to our previously defined 
+  is_holomorphic_on functions using results in 
+  analysis.complex.upper_half_plane.functions_bounded_at_infty.
+
+## Main definitions:
+
+* class is_holomoprhic_bdd: sets the conditions any f : ℍ' → ℂ has to satisfy; 
+
+* pseries_of_holomorphic: is the power series of a given is_holomorphic_bdd function;
+
+* We define the order of a is_holomoprhic_bdd function at a given point.
+
+## Main results:
+
+* Any function thas satisfies is_holomorphic_bdd is also analytic using 
+  its extension by zero (from file: holomorphic_functions.lean).
+
+* The pseries_of_holomorphic is the formal_multilinear_series of the function.
+
+* The order is well defined.
+
+-/
 
 open complex
-
 open_locale big_operators classical
-
-
 noncomputable theory
 
 open modular_form modular_group complex filter asymptotics
@@ -22,14 +42,10 @@ local notation `ℍ'`:=(⟨upper_half_space , upper_half_plane_is_open⟩: open_
 
 local notation `ℍ`:=upper_half_plane
 
---instance : charted_space ℂ ℂ := infer_instance
-
 instance : charted_space ℂ ℍ' := infer_instance
 
 local prefix `↑ₘ`:1024 := @coe _ (matrix (fin 2) (fin 2) _) _
-
 local notation `GL(` n `, ` R `)`⁺:= matrix.GL_pos (fin n) R
-
 local notation `SL(` n `, ` R `)`:= matrix.special_linear_group (fin n) R
 
 localized "notation (name := modular_group.fd) `𝒟` := modular_group.fd" in modular
@@ -46,31 +62,11 @@ def S₀' (F : Merℍ) : set 𝒟ᵒ := {z | F.order z ≠ 0}
 lemma S₀'_finite (F : Merℍ) : (S₀' F).finite := by sorry
 def S₀ (F : Merℍ) := set.finite.to_finset (S₀'_finite F)
 
-/-instance : has_coe 𝒟ᵒ 𝒟 := 
-begin
-sorry,
-end
-
-instance coe_fdo : has_coe (set 𝒟ᵒ) (set 𝒟) := ⟨λ U, has_coe.coe '' U⟩
--/
 
 def S₁' (F: Merℍ) : set (frontier 𝒟) := {z | F.order ≠ 0} 
 lemma S₁'_finite (F : Merℍ) : (S₁' F).finite := by sorry
 def S₁ (F : Merℍ) := set.finite.to_finset (S₁'_finite F)
 
-/-
-def S_set (F : Merℍ) : set 𝒟 := {z | F.order ≠ 0}
-
-instance coe_fd_ℍ : has_coe 𝒟 ℍ := 
-begin
-sorry,
-end
-
-instance coe_fd_ℍ_set : has_coe (set 𝒟) (set ℍ') := ⟨λ U, subtype.val '' U⟩
--/
---Valuation at infty
-
---Valuation at ∞ of a Holℍ function:
 
 localized "notation `𝔻` := complex.unit_disc" in unit_disc
 
@@ -86,8 +82,6 @@ begin
   use 0,
   exact this,
 end
-
-
 
 def map_to_upper (x : ℝ) (y : ℝ) (hy : y>0) : ℍ := ⟨(x + y*I),
   by {
@@ -109,24 +103,10 @@ end
 def val_infty_Merℍ (f : Merℍ) (hf : one_periodicity f.map) (y0 : ℝ) (hy0 : y0 > 0) : ℤ := sorry
 --Inf {n : ℤ | (q_expansion_an n y0 hy0 f hf) ≠ 0}
 
-/-aquí hauria de ser min dels n ∈ ℕ tal que modular_form_an ≠ 0
-
-example  (f : Holℍ) (k : ℤ) (hf : one_periodicity f)
-: q_expansion_an (val_infty_Holℍ f hf 1 zero_lt_one) 1 zero_lt_one f hf ≠ 0 :=
-  begin
-  change val_infty_Holℍ f k hf ∈ {n | modular_form_an n f.val hf ≠ 0},
-  apply nat.Inf_mem _,
-  sorry
-end
--/
-
 lemma Merℍ.is_oneperiodic (k : ℤ) (F : Merℍwm k) : one_periodicity F.val.map :=
 begin
 sorry,
 end
-
---def val_infty (k : ℤ) (F : Merℍwm k) : ℤ :=  val_infty_Merℍ F.val.numerator Merℍ.numerator_is_oneperiodic F.val
-
 
 theorem valence_formula (k : ℤ) (F : Merℍwm k) :
   6 * (val_infty_Merℍ F.val (Merℍ.is_oneperiodic k F) 1 one_pos) + 3 * (val_i F.val) + 2 * (val_rho F.val)
