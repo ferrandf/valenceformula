@@ -9,7 +9,7 @@ on:
 
 jobs:
   deploy:
-    runs-on: ubuntu-18.04
+    runs-on: ubuntu-latest
     env: 
       branch: 'main'
       source_base_url: "https://raw.githubusercontent.com/${{ github.repository }}/main/"
@@ -19,31 +19,42 @@ jobs:
         uses: actions/checkout@v2
         with:
           ref: ${{ env.branch }}
-
-      - name: Setup Python
-        uses: actions/setup-python@v2
-        with:
-          python-version: '3.8'
-
-      - name: Update packages
-        run: sudo apt install -y unzip make nodejs gettext build-essential libssl-dev zlib1g-dev libbz2-dev libreadline-dev libsqlite3-dev wget curl llvm libncurses5-dev libncursesw5-dev xz-utils tk-dev libffi-dev liblzma-dev python-openssl
- 
-      - name: Install elan
+      - name: update version branches
+        uses: leanprover-contrib/update-versions-action@master
+      - name: install elan
         run: |
           set -o pipefail
-          curl https://raw.githubusercontent.com/Kha/elan/master/elan-init.sh -sSf | sh -s -- -v -y
-          sudo ln -s $HOME/.elan/bin/* /usr/local/bin;
+          curl https://raw.githubusercontent.com/leanprover/elan/master/elan-init.sh -sSf | sh -s -- --default-toolchain none -y
+          ~/.elan/bin/lean --version
+          echo "$HOME/.elan/bin" >> $GITHUB_PATH
+          echo "short_lean_version=$(~/.elan/bin/lean --run scripts/lean_version.lean)" >> $GITHUB_ENV
 
-      - name: Install python Lean dependencies
+      - name: install Python
+        if: ${{ ! 0 }}
+        uses: actions/setup-python@v1
+        with:
+          python-version: 3.8
+
+      - name: install mathlibtools
+        run: python -m pip install --upgrade pip mathlibtools
+
+      - name: leanpkg configure
+        run: leanpkg configure
+
+      - name: get mathlib cache
+        run: leanproject get-mathlib-cache || true
+        
+      - name: leanpkg build
+        id: build
         run: |
-          python -m pip install --upgrade pip requests markdown2 toml mathlibtools toposort invoke
-
+          echo "::set-output name=started::true"
+          lean --json --make src
+          lean --json --make src
       - name: upgrade Lean and dependencies
         uses: leanprover-contrib/lean-upgrade-action@master
         with:
           repo: ${{ github.repository }}
           access-token: ${{ secrets.GITHUB_TOKEN }}
-
     ## Now we generate the editor ##
 
       - name: Install lean editor
