@@ -1,3 +1,6 @@
+/-Included in the project Formalizing Modular Forms (Ferran Delgà Fernández)
+under the supervision of Marc Masdeu.-/
+
 import algebra.module.submodule.basic
 import algebra.group_power.basic
 import analysis.complex.upper_half_plane.basic
@@ -10,6 +13,24 @@ import number_theory.modular_forms.slash_actions
 import number_theory.modular_forms.slash_invariant_forms
 import linear_algebra.general_linear_group
 import .merh
+
+/-
+# Modular forms definition:
+
+- We define modular forms on SL₂(ℤ) and for congruence subgroups
+
+## Main definitions:
+
+* weakly_modular_weight_k sets the conditions for a function to be weakly modular.
+
+* weakly_modular_submodule_weight_k is the submodule associated to the previous definition.
+
+* class modular_form_weight_k defines modular forms.
+
+* weakly_meromorphic_modular_weight_k defines weakly modularity for Merℍ functions. 
+
+* Merℍwm is the subtype for meromorphic modular forms.
+-/
 
 open complex
 
@@ -41,7 +62,6 @@ variable (M : GL(2, ℝ)⁺)
 open modular_form
 open complex matrix matrix.special_linear_group upper_half_plane
 open_locale upper_half_plane complex_conjugate
-
 
 variables (Γ : subgroup SL(2,ℤ)) (C : GL(2, ℝ)⁺) (k: ℤ) (f : (ℍ → ℂ))
 
@@ -100,14 +120,12 @@ def space_of_modular_forms_weight_k (k : ℤ) : submodule ℂ (ℍ' → ℂ) := 
 def weakly_modular_weight_k_subgroup (k : ℤ) (Γ : subgroup SL(2,ℤ)) (f : ℍ' → ℂ) :=
   ∀ (γ : Γ),  (f ∣[k] (γ : GL(2, ℝ)⁺)) = f
 
-
 lemma zero_weakly_modular_subgroup (k : ℤ) (Γ : subgroup SL(2,ℤ)) : weakly_modular_weight_k_subgroup k Γ (0 : ℍ' → ℂ) :=
 begin
 intro γ,
 simp,
 sorry,
 end
-
 
 def weakly_modular_submodule_weight_k_subgroup (k : ℤ) (Γ : subgroup SL(2,ℤ)) : submodule ℂ (ℍ' → ℂ) := {
   carrier := weakly_modular_weight_k_subgroup k Γ,
@@ -130,7 +148,6 @@ def weakly_modular_submodule_weight_k_subgroup (k : ℤ) (Γ : subgroup SL(2,ℤ
     apply this,
   },
 }
-
 
 --Space of modular forms for congruence subgroups:
 class modular_form_weight_k_subgroup (k : ℤ) (Γ : subgroup SL(2,ℤ)) (f : ℍ' → ℂ) : Prop :=
@@ -160,5 +177,9 @@ instance mem_mer : has_mem Merℍ (submodule ℂ (ℍ' → ℂ)) := ⟨λ F V, F
 --Meromorphic modular form subtype
 
 def Merℍwm (k : ℤ) :=
-{F : Merℍ | weakly_meromorphic_modular_weight_k k F}
+{F : Merℍ // weakly_meromorphic_modular_weight_k k F}
 
+lemma Merℍwm_def (k : ℤ) (F : Merℍwm k) : weakly_meromorphic_modular_weight_k k F.val :=
+begin
+exact F.prop,
+end

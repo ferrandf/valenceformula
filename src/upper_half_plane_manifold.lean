@@ -1,3 +1,6 @@
+/-Included in the project Formalizing Modular Forms (Ferran Delgà Fernández)
+under the supervision of Marc Masdeu.-/
+
 import analysis.complex.upper_half_plane.topology
 import geometry.manifold.mfderiv
 import .holomorphic_functions
