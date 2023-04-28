@@ -50,6 +50,66 @@ localized "notation (name := modular_group.fd) `𝒟` := modular_group.fd" in mo
 localized "notation (name := modular_group.fdo) `𝒟ᵒ` := modular_group.fdo" in modular
 
 
+--Definitions of orders/valuations:
+
+def val_i (F : Merℍ) := F.order (⟨(⟨0, 1⟩ : ℂ), by {simp only [zero_lt_one],} ⟩ : ℍ)
+
+def val_rho (F : Merℍ) := F.order (⟨(⟨-0.5, (real.sqrt (3 : ℝ))*0.5⟩ : ℂ), by {simp,} ⟩ : ℍ)
+
+-- Definitions of S₀ and S₁ sets:
+
+def S₀' (F : Merℍ) : set 𝒟ᵒ := {z | F.order z ≠ 0}
+lemma S₀'_finite (F : Merℍ) : (S₀' F).finite := by sorry
+def S₀ (F : Merℍ) := set.finite.to_finset (S₀'_finite F)
+
+
+def S₁' (F: Merℍ) : set (frontier 𝒟) := {z | F.order ≠ 0} 
+lemma S₁'_finite (F : Merℍ) : (S₁' F).finite := by sorry
+def S₁ (F : Merℍ) := set.finite.to_finset (S₁'_finite F)
+
+
+def map_to_upper (x : ℝ) (y : ℝ) (hy : y>0) : ℍ := ⟨(x + y*I),
+  by {
+    simp only [complex.add_im, complex.of_real_im, zero_add, complex.of_real_mul_im,complex.I_im, mul_one],
+    exact hy,
+    } ⟩
+
+def q_expansion_an (n : ℤ) (y : ℝ) (hy : y>0) (f : Merℍ) (hf : one_periodicity f.map)
+: ℂ := exp(2 * π * n * y) * ∫ (x : ℝ) in 0..1, ( exp (-2 * π * I * n *(map_to_upper x y hy))) * f.map (map_to_upper x y hy)
+
+
+def set_of_coeffs (y : ℝ) (hy : y>0) (f : Merℍ) (hf : one_periodicity f.map) : set ℤ := 
+  {n : ℤ | (q_expansion_an n y hy f hf) ≠ 0}
+
+lemma coeffs_lower_set (y : ℝ) (hy : y>0) (f : Merℍ) (hf : one_periodicity f.map) : is_lower_set (set_of_coeffs y hy f hf) :=
+begin
+sorry,
+end
+
+variables {s : set ℕ}
+def vtst (hs : s.nonempty) : ℕ := Inf s
+example (hs : s.nonempty) : vtst hs ∈ s:=
+begin
+exact Inf_mem hs,
+end
+
+
+def val_infty_Merℍ (f : Merℍ) (hf : one_periodicity f.map) (y0 : ℝ) (hy0 : y0 > 0) : ℤ := sorry--Inf (set_of_coeffs y0 hy0 f hf)
+
+lemma Merℍ.is_oneperiodic (k : ℤ) (F : Merℍwm k) : one_periodicity F.val.map :=
+begin
+unfold one_periodicity,
+intro z,
+have h := F.prop T,
+rw Merℍ.map, 
+sorry,
+end
+
+theorem valence_formula (k : ℤ) (F : Merℍwm k) :
+  6 * (val_infty_Merℍ F.val (Merℍ.is_oneperiodic k F) 1 one_pos) + 3 * (val_i F.val) + 2 * (val_rho F.val)
+  + 6 * ∑ τ in (S₀ F.val), (F.val.order τ) + 3 * ∑ τ in (S₁ F.val), (F.val.order τ) = k/2 := by sorry
+
+
 def Q (z : ℂ) : ℂ := exp ( 2 * π * I * z )
 
 def Z (q : ℂ) : ℂ := 1 / (2 * π * I) * log q
@@ -222,63 +282,3 @@ begin
 end
 
 end G_dfn
-
-
---Definitions of orders/valuations:
-
-def val_i (F : Merℍ) := F.order (⟨(⟨0, 1⟩ : ℂ), by {simp only [zero_lt_one],} ⟩ : ℍ)
-
-def val_rho (F : Merℍ) := F.order (⟨(⟨-0.5, (real.sqrt (3 : ℝ))*0.5⟩ : ℂ), by {simp,} ⟩ : ℍ)
-
--- Definitions of S₀ and S₁ sets:
-
-def S₀' (F : Merℍ) : set 𝒟ᵒ := {z | F.order z ≠ 0}
-lemma S₀'_finite (F : Merℍ) : (S₀' F).finite := by sorry
-def S₀ (F : Merℍ) := set.finite.to_finset (S₀'_finite F)
-
-
-def S₁' (F: Merℍ) : set (frontier 𝒟) := {z | F.order ≠ 0} 
-lemma S₁'_finite (F : Merℍ) : (S₁' F).finite := by sorry
-def S₁ (F : Merℍ) := set.finite.to_finset (S₁'_finite F)
-
-
-def map_to_upper (x : ℝ) (y : ℝ) (hy : y>0) : ℍ := ⟨(x + y*I),
-  by {
-    simp only [complex.add_im, complex.of_real_im, zero_add, complex.of_real_mul_im,complex.I_im, mul_one],
-    exact hy,
-    } ⟩
-
-def q_expansion_an (n : ℤ) (y : ℝ) (hy : y>0) (f : Merℍ) (hf : one_periodicity f.map)
-: ℂ := exp(2 * π * n * y) * ∫ (x : ℝ) in 0..1, ( exp (-2 * π * I * n *(map_to_upper x y hy))) * f.map (map_to_upper x y hy)
-
-
-def set_of_coeffs (y : ℝ) (hy : y>0) (f : Merℍ) (hf : one_periodicity f.map) : set ℤ := 
-  {n : ℤ | (q_expansion_an n y hy f hf) ≠ 0}
-
-lemma coeffs_lower_set (y : ℝ) (hy : y>0) (f : Merℍ) (hf : one_periodicity f.map) : is_lower_set (set_of_coeffs y hy f hf) :=
-begin
-sorry,
-end
-
-variables {s : set ℕ}
-def vtst (hs : s.nonempty) : ℕ := Inf s
-example (hs : s.nonempty) : vtst hs ∈ s:=
-begin
-exact Inf_mem hs,
-end
-
-
-def val_infty_Merℍ (f : Merℍ) (hf : one_periodicity f.map) (y0 : ℝ) (hy0 : y0 > 0) : ℤ := sorry--Inf (set_of_coeffs y0 hy0 f hf)
-
-lemma Merℍ.is_oneperiodic (k : ℤ) (F : Merℍwm k) : one_periodicity F.val.map :=
-begin
-unfold one_periodicity,
-intro z,
-have h := F.prop T,
-rw Merℍ.map, 
-sorry,
-end
-
-theorem valence_formula (k : ℤ) (F : Merℍwm k) :
-  6 * (val_infty_Merℍ F.val (Merℍ.is_oneperiodic k F) 1 one_pos) + 3 * (val_i F.val) + 2 * (val_rho F.val)
-  + 6 * ∑ τ in (S₀ F.val), (F.val.order τ) + 3 * ∑ τ in (S₁ F.val), (F.val.order τ) = k/2 := by sorry

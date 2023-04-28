@@ -73,8 +73,10 @@ def weakly_modular_weight_k (k : ℤ) (f : ℍ' → ℂ) :=
 
 lemma zero_weakly_modular (k : ℤ) : weakly_modular_weight_k k (0 : ℍ' → ℂ) :=
 begin
-
-sorry,
+intro γ,
+ext1,
+rw slash,
+simp,
 end
 
 def one_periodicity (f : ℍ' → ℂ) := ∀ (z : ℍ'), extend_by_zero f (z + 1) = extend_by_zero f (z)
@@ -123,8 +125,9 @@ def weakly_modular_weight_k_subgroup (k : ℤ) (Γ : subgroup SL(2,ℤ)) (f : �
 lemma zero_weakly_modular_subgroup (k : ℤ) (Γ : subgroup SL(2,ℤ)) : weakly_modular_weight_k_subgroup k Γ (0 : ℍ' → ℂ) :=
 begin
 intro γ,
+ext1,
+rw slash,
 simp,
-sorry,
 end
 
 def weakly_modular_submodule_weight_k_subgroup (k : ℤ) (Γ : subgroup SL(2,ℤ)) : submodule ℂ (ℍ' → ℂ) := {

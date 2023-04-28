@@ -93,8 +93,6 @@ intros u v hu hv,
 intros h hhu hhv,
 by_cases i : upper_half_space ⊆ u,
 by_cases j : upper_half_space ⊆ v,
-
-
 sorry,
 sorry,
 sorry,
