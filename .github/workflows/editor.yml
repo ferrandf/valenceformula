@@ -65,7 +65,9 @@ jobs:
           mv build/shell/* dist/
 
       - name: generate library.zip
-        run: ./generate-library.sh
+        run: |
+          cd
+          ./generate-library.sh
 
       - name: upload artifacts
         uses: actions/upload-artifact@v2
