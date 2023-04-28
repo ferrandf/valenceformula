@@ -59,6 +59,9 @@ jobs:
       - name : Get server files
         run: |
           mkdir -p dist
+          VER=`lean -v |sed -nE 's/.*version ([0-9]+\.[0-9]+\.[0-9]+).*/\1/pi'`
+          wget -q https://github.com/leanprover-community/lean/releases/download/v$VER/lean-$VER--browser.zip
+          unzip *.zip
           mv build/shell/* dist/
 
       - name: generate library.zip
