@@ -49,8 +49,15 @@ end
 lemma extend_by_zero_f_eq_zero [has_zero β] (f : s → β)
 (h : extend_by_zero f = 0) : f = 0 :=
 begin
-
-sorry,
+ext x,
+simp,
+obtain ⟨y,hy⟩ := x,
+have H : (extend_by_zero f) y = 0,
+{
+  simp only [pi.zero_apply, h],
+},
+rw extend_by_zero_eq_of_mem _ y hy at H,
+exact H,
 end
 
 lemma extend_by_zero_add [add_group β] (f g : s → β) :

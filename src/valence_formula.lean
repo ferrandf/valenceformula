@@ -78,13 +78,18 @@ def q_expansion_an (n : ℤ) (y : ℝ) (hy : y>0) (f : Merℍ) (hf : one_periodi
 : ℂ := exp(2 * π * n * y) * ∫ (x : ℝ) in 0..1, ( exp (-2 * π * I * n *(map_to_upper x y hy))) * f.map (map_to_upper x y hy)
 
 
-def set_of_coeffs (y : ℝ) (hy : y>0) (f : Merℍ) (hf : one_periodicity f.map) : set ℤ := 
-  {n : ℤ | (q_expansion_an n y hy f hf) ≠ 0}
+def set_coeffs (y : ℝ) (hy : y>0) (f : Merℍ) (hf : one_periodicity f.map) :  set ℤ :=
+{n : ℤ | (q_expansion_an n y hy f hf) ≠ 0}
 
-lemma coeffs_lower_set (y : ℝ) (hy : y>0) (f : Merℍ) (hf : one_periodicity f.map) : is_lower_set (set_of_coeffs y hy f hf) :=
-begin
-sorry,
-end
+
+lemma set_coeffs_is_bdd_below (y : ℝ) (hy : y>0) (f : Merℍ) (hf : one_periodicity f.map) :
+bdd_below (set_coeffs (y : ℝ) (hy : y>0) (f : Merℍ) (hf : one_periodicity f.map)) := sorry
+
+lemma set_coeffs_nonempty (y : ℝ) (hy : y>0) (f : Merℍ) (hf : one_periodicity f.map) :
+∃ n : ℤ, n ∈ (set_coeffs (y : ℝ) (hy : y>0) (f : Merℍ) (hf : one_periodicity f.map)) := sorry
+
+
+
 
 variables {s : set ℕ}
 def vtst (hs : s.nonempty) : ℕ := Inf s
@@ -94,13 +99,16 @@ exact Inf_mem hs,
 end
 
 
-def val_infty_Merℍ (f : Merℍ) (hf : one_periodicity f.map) (y0 : ℝ) (hy0 : y0 > 0) : ℤ := sorry--Inf (set_of_coeffs y0 hy0 f hf)
+def val_infty_Merℍ (f : Merℍ) (hf : one_periodicity f.map) (y : ℝ) (hy: y > 0) : ℤ :=
+classical.some (int.exists_least_of_bdd (set_coeffs_is_bdd_below y hy f hf)
+(set_coeffs_nonempty y hy f hf))
 
 lemma Merℍ.is_oneperiodic (k : ℤ) (F : Merℍwm k) : one_periodicity F.val.map :=
 begin
 unfold one_periodicity,
 intro z,
 have h := F.prop T,
+simp [slash_mer_left] at h,
 rw Merℍ.map, 
 sorry,
 end

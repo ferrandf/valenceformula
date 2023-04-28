@@ -88,14 +88,11 @@ end
 
 lemma preconn_ℍ' : is_preconnected upper_half_space :=
 begin
-unfold is_preconnected,
-intros u v hu hv,
-intros h hhu hhv,
-by_cases i : upper_half_space ⊆ u,
-by_cases j : upper_half_space ⊆ v,
-sorry,
-sorry,
-sorry,
+apply convex.is_preconnected,
+intros z hz,
+rw star_convex,
+intros y hy a b ha hb hab,
+sorry
 end
 
 lemma hol_bdd.eventually_eq_zero_everywhere (f : Holℍ) 

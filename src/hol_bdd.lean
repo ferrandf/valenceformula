@@ -87,7 +87,7 @@ begin
   apply differentiable_on.analytic_at hf,
   refine mem_nhds_iff.mpr _,
   use (univ : set ℍ'),
-  exact ⟨rfl.subset, open_univ, sorry⟩,--⟨z, by finish⟩⟩,
+  exact ⟨rfl.subset, open_univ, ⟨z, by tauto⟩⟩,
 end
 
 lemma analytic_on_of_holomorphic (f : ℍ' → ℂ) [h : is_holomorphic_bdd f] : 
