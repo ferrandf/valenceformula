@@ -49,13 +49,8 @@ jobs:
       - name: leanpkg build
         id: build
         run: |
-          echo "::set-output name=started::true"
           lean --make src || true
-      - name: upgrade Lean and dependencies
-        uses: leanprover-contrib/lean-upgrade-action@master
-        with:
-          repo: ${{ github.repository }}
-          access-token: ${{ secrets.GITHUB_TOKEN }}
+
     ## Now we generate the editor ##
 
       - name: Install lean editor
