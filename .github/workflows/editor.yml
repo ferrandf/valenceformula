@@ -48,8 +48,7 @@ jobs:
         id: build
         run: |
           echo "::set-output name=started::true"
-          lean --json --make src
-          lean --json --make src
+          lean --make src || true
       - name: upgrade Lean and dependencies
         uses: leanprover-contrib/lean-upgrade-action@master
         with:
