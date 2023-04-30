@@ -12,10 +12,6 @@ LAST_COMMIT=$(git ls-remote https://github.com/ferrandf/valenceformula.git HEAD 
 echo "valenceformula = {git = \"https://github.com/ferrandf/valenceformula\", rev = \"$LAST_COMMIT\"}" >> leanpkg.toml
 
 # Generate a zip in dist/library.zip
-
-git init
-rm -rf _target/deps/mathlib/test
-rm -rf _target/deps/mathlib/scripts
-rm -rf _target/deps/mathlib/roadmap          
+        
 cd ..
 ./lean-web-editor/mk_library.py -i combined_lib | python ./lean-web-editor/detect_errors.py
