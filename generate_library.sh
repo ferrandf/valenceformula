@@ -12,13 +12,6 @@ LAST_COMMIT=$(git ls-remote https://github.com/ferrandf/valenceformula.git HEAD 
 echo "valenceformula = {git = \"https://github.com/ferrandf/valenceformula\", rev = \"$LAST_COMMIT\"}" >> leanpkg.toml
 
 # Generate a zip in dist/library.zip
-
-git init
-LATEST_BROWSER_LEAN=$(curl -s -N https://raw.githubusercontent.com/leanprover-community/mathlib/master/leanpkg.toml | grep -m1 lean_version | cut -d'"' -f2 | cut -d':' -f2)
-elan override set leanprover-community/lean:$LATEST_BROWSER_LEAN
-leanproject --no-lean-upgrade up
-rm -rf _target/deps/mathlib/test
-rm -rf _target/deps/mathlib/scripts
-rm -rf _target/deps/mathlib/roadmap          
+        
 cd ..
 ./lean-web-editor/mk_library.py -i combined_lib | python ./lean-web-editor/detect_errors.py
