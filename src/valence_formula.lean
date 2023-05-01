@@ -88,17 +88,6 @@ bdd_below (set_coeffs (y : ℝ) (hy : y>0) (f : Merℍ) (hf : one_periodicity f.
 lemma set_coeffs_nonempty (y : ℝ) (hy : y>0) (f : Merℍ) (hf : one_periodicity f.map) :
 ∃ n : ℤ, n ∈ (set_coeffs (y : ℝ) (hy : y>0) (f : Merℍ) (hf : one_periodicity f.map)) := sorry
 
-
-
-
-variables {s : set ℕ}
-def vtst (hs : s.nonempty) : ℕ := Inf s
-example (hs : s.nonempty) : vtst hs ∈ s:=
-begin
-exact Inf_mem hs,
-end
-
-
 def val_infty_Merℍ (f : Merℍ) (hf : one_periodicity f.map) (y : ℝ) (hy: y > 0) : ℤ :=
 classical.some (int.exists_least_of_bdd (set_coeffs_is_bdd_below y hy f hf)
 (set_coeffs_nonempty y hy f hf))
@@ -109,7 +98,7 @@ unfold one_periodicity,
 intro z,
 have h := F.prop T,
 simp [slash_mer_left] at h,
-rw Merℍ.map, 
+rw Merℍ.map,
 sorry,
 end
 

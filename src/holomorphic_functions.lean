@@ -1,3 +1,6 @@
+/-Included in the project Formalizing Modular Forms (Ferran Delgà Fernández)
+under the supervision of Marc Masdeu.-/
+
 import analysis.complex.basic
 import analysis.calculus.deriv
 import tactic.pi_instances
@@ -6,6 +9,25 @@ import analysis.normed_space.basic
 import analysis.calculus.deriv
 import analysis.analytic.basic
 
+/-
+# Holomorphic functions definition:
+
+- We define holomorphic functions from an open subset of ℂ with values on ℂ.
+
+- We define the extension by zero to work with functions ℂ → ℂ (to apply lemmas of analytic functions later).
+
+## Main definitions:
+
+* Given f : s → ℂ, extend_by_zero f is a function ℂ → ℂ that is 0 outside s and f z when z ∈ s.
+
+* A function is_holomorphic_on an open subset of ℂ when has_deriv_within_at using f' as its
+  derivative and extend_by_zero as the main function.
+
+## Main results:
+
+* Holomorphic functions are actually a ring (subring (D.1 → ℂ)) 
+  and a submodule (submodule (ℂ)  (D.1 → ℂ))
+-/
 
 
 local attribute [instance] classical.prop_decidable

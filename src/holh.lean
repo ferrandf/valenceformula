@@ -86,15 +86,6 @@ begin
   exact hp hc,
 end
 
-lemma preconn_ℍ' : is_preconnected upper_half_space :=
-begin
-apply convex.is_preconnected,
-intros z hz,
-rw star_convex,
-intros y hy a b ha hb hab,
-sorry
-end
-
 lemma hol_bdd.eventually_eq_zero_everywhere (f : Holℍ) 
   (x : ℍ') (hF : ∀ᶠ z in 𝓝 x, (extend_by_zero f.val) z = 0):
   (extend_by_zero f.val) = (0 : ℂ → ℂ) :=

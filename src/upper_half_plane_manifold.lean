@@ -16,6 +16,33 @@ def upper_half_space := {z : ℂ | 0 <  z.im}
 
 #check upper_half_space
 
+lemma preconn_ℍ' : is_preconnected upper_half_space :=
+begin
+apply convex.is_preconnected,
+intros z hz,
+rw star_convex,
+intros y hy a b ha hb hab,
+rw upper_half_space,
+simp,
+by_cases ht : a = 0,
+rw ht at hab,
+simp [ht, hab], simp at hab, rw hab, simp only [one_mul], exact hy,
+by_cases hr : b = 0,
+rw hr at hab, 
+simp [hr, hab], simp at hab, rw hab, simp only [one_mul], exact hz,
+apply add_pos,
+rw eq_comm at ht,
+have : 0 < a,
+have := ne.le_iff_lt ht,
+exact this.1 ha,
+exact mul_pos this hz,
+rw eq_comm at hr,
+have : 0 < b,
+have := ne.le_iff_lt hr,
+exact this.1 hb,
+exact mul_pos this hy,
+end
+
 lemma hcoe : upper_half_space = coe '' (set.univ : set upper_half_plane) :=
 begin
 simp, refl,
