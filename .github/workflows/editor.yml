@@ -107,7 +107,7 @@ jobs:
   
       - name: build site and deploy
         run: |
-          ./deploy.sh
+          ./lean-web-editor/deploy.sh
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v1
