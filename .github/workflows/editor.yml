@@ -78,9 +78,7 @@ jobs:
           echo "valenceformula = {git = \"https://github.com/ferrandf/valenceformula\", rev = \"$LAST_COMMIT\"}" >> leanpkg.toml
 
           leanproject get-mathlib-cache || true
-
-      - name: Continue
-        run: |
+          
           # Generate a zip in dist/library.zip
           rm -rf _target/deps/mathlib/counterexamples
           rm -rf _target/deps/mathlib/scripts
@@ -88,7 +86,6 @@ jobs:
           rm -rf _target/deps/mathlib/test
           cd ..
           ./lean-web-editor/mk_library.py -i combined_lib
-
 
       - name: upload artifacts
         uses: actions/upload-artifact@v2
