@@ -11,6 +11,8 @@ sed -i '/path/d' leanpkg.toml
 LAST_COMMIT=$(git ls-remote https://github.com/ferrandf/valenceformula.git HEAD | cut -f1)
 echo "valenceformula = {git = \"https://github.com/ferrandf/valenceformula\", rev = \"$LAST_COMMIT\"}" >> leanpkg.toml
 
+leanproject get-mathlib-cache || true
+
 # Generate a zip in dist/library.zip
         
 cd ..
