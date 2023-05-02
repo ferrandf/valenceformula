@@ -85,6 +85,10 @@ jobs:
       - name: Continue
         run: |
           # Generate a zip in dist/library.zip
+          rm -rf _target/deps/mathlib/counterexamples
+          rm -rf _target/deps/mathlib/scripts
+          rm -rf _target/deps/mathlib/archive
+          rm -rf _target/deps/mathlib/test
           cd ..
           ./lean-web-editor/mk_library.py -i combined_lib
 
