@@ -79,6 +79,11 @@ jobs:
 
           leanproject get-mathlib-cache || true
 
+      - name: Setup tmate session
+        uses: mxschmitt/action-tmate@v3
+      
+      - name: Continue
+        run: |
           # Generate a zip in dist/library.zip
           cd ..
           ./lean-web-editor/mk_library.py -i combined_lib
