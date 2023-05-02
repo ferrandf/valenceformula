@@ -97,8 +97,15 @@ begin
 unfold one_periodicity,
 intro z,
 have h := F.prop T,
-simp [slash_mer_left] at h,
-rw Merℍ.map,
+/-have hw : slash_mer_left k T F.val.numerator.val F.val.denominator.val.val z = slash_mer_right k T F.val.numerator.val F.val.denominator.val.val z,
+sorry,
+rw slash_mer_left_def k T F.val.numerator.val F.val.denominator.val.val z at hw,
+rw slash_mer_right_def k T F.val.numerator.val F.val.denominator.val.val z at hw,
+have : (F.val.numerator.val (↑T • z) / F.val.denominator.val.val (↑T • z)) * upper_half_plane.denom ↑T z ^ -k = F.val.numerator.val z / F.val.denominator.val.val z,
+{
+  sorry,
+},
+rw Merℍ.map,-/
 sorry,
 end
 
@@ -106,6 +113,7 @@ theorem valence_formula (k : ℤ) (F : Merℍwm k) :
   6 * (val_infty_Merℍ F.val (Merℍ.is_oneperiodic k F) 1 one_pos) + 3 * (val_i F.val) + 2 * (val_rho F.val)
   + 6 * ∑ τ in (S₀ F.val), (F.val.order τ) + 3 * ∑ τ in (S₁ F.val), (F.val.order τ) = k/2 := by sorry
 
+/- Definition of q(z), z(q)...-/
 
 def Q (z : ℂ) : ℂ := exp ( 2 * π * I * z )
 

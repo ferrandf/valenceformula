@@ -172,6 +172,18 @@ def slash_mer_left (k : ℤ) (γ : SL(2,ℤ)) (f g : ℍ → ℂ) (z : ℍ) : �
 def slash_mer_right (k : ℤ) (γ : SL(2,ℤ)) (f g : ℍ → ℂ) (z : ℍ) : ℂ :=
   f(z) * g(γ • z)
 
+lemma slash_mer_left_def (k : ℤ) (γ : SL(2,ℤ)) (f g : ℍ → ℂ) (z : ℍ) : 
+  slash_mer_left k γ f g z = f(γ • z) * g(z) * (upper_half_plane.denom γ z)^(-k) :=
+begin
+refl,
+end
+
+lemma slash_mer_right_def (k : ℤ) (γ : SL(2,ℤ)) (f g : ℍ → ℂ) (z : ℍ) :
+  slash_mer_right k γ f g z = f(z) * g(γ • z) :=
+begin
+  refl,
+end
+
 def weakly_meromorphic_modular_weight_k (k : ℤ) (F : Merℍ) :=
   ∀ (γ : SL(2,ℤ)), slash_mer_left k γ F.numerator.val F.denominator.val.val = slash_mer_right k γ F.numerator.val F.denominator.val.val
 
