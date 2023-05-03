@@ -105,9 +105,9 @@ jobs:
       - name: place editor in the website
         run: mv lean-web-editor/dist html/
   
-      - name: build site and deploy
-        run: |
-          ./lean-web-editor/deploy.sh
+#      - name: build site and deploy
+#        run: |
+#          ./lean-web-editor/deploy.sh
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v1
