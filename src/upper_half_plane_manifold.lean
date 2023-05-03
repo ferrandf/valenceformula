@@ -3,7 +3,7 @@ under the supervision of Marc Masdeu.-/
 
 import analysis.complex.upper_half_plane.topology
 import geometry.manifold.mfderiv
-import .holomorphic_functions
+import holomorphic_functions
 
 local notation `ℍ`:=upper_half_plane
 

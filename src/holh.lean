@@ -1,7 +1,7 @@
 /-Included in the project Formalizing Modular Forms (Ferran Delgà Fernández)
 under the supervision of Marc Masdeu.-/
 
-import .hol_bdd
+import hol_bdd
 
 /-
 # Holomorphic and bounded at im_infty functions subring definition (Holℍ):

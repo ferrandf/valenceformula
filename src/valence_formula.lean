@@ -10,7 +10,7 @@ import analysis.complex.upper_half_plane.topology
 import number_theory.modular
 import group_theory.index
 import order.upper_lower
-import .mod_f
+import mod_f
 
 /-
 # Valence formula statement:

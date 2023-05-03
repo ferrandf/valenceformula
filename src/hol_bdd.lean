@@ -8,8 +8,8 @@ import analysis.calculus.fderiv
 import algebra.algebra.basic
 import ring_theory.subring.basic
 import ring_theory.localization.fraction_ring
-import .upper_half_plane_manifold
-import .holomorphic_functions
+import upper_half_plane_manifold
+import holomorphic_functions
 import analysis.complex.basic
 import analysis.analytic.isolated_zeros
 import analysis.analytic.uniqueness

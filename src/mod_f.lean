@@ -12,7 +12,7 @@ import geometry.manifold.mfderiv
 import number_theory.modular_forms.slash_actions
 import number_theory.modular_forms.slash_invariant_forms
 import linear_algebra.general_linear_group
-import .merh
+import merh
 
 /-
 # Modular forms definition:
