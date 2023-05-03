@@ -103,7 +103,9 @@ jobs:
           NODE_ENV=production ./node_modules/.bin/webpack
   
       - name: place editor in the website
-        run: mv lean-web-editor/dist html/editor
+        run: |
+          mkdir html/editor
+          mv lean-web-editor/dist html/editor
   
 #      - name: build site and deploy
 #        run: |
