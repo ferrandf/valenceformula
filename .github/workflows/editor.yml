@@ -104,7 +104,7 @@ jobs:
   
       - name: place editor in the website
         run: |
-          mkdir -p html/editor
+          mkdir -p html/
           mv lean-web-editor/dist html/editor
   
 #      - name: build site and deploy
@@ -113,8 +113,7 @@ jobs:
 
       - name : Copy html files
         run:  cp *.html html/
-      - name: Setup tmate session
-        uses: mxschmitt/action-tmate@v3
+
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v1
         with:
