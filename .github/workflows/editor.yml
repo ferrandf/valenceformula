@@ -104,7 +104,7 @@ jobs:
   
       - name: place editor in the website
         run: |
-          mkdir html/editor
+          mkdir -p html/editor
           mv lean-web-editor/dist html/editor
   
 #      - name: build site and deploy
